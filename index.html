@@ -7,13 +7,13 @@
 
     <title>Localiza tu coche</title>
 
-    <!-- MapLibre GL JS -->
+    <!-- MapTiler SDK -->
     <link
-        href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css"
         rel="stylesheet"
     >
 
-    <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js"></script>
 
     <style>
         html,
@@ -22,6 +22,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            overflow: hidden;
         }
 
         #map {
@@ -29,14 +30,69 @@
             height: 100%;
         }
 
+        /* Punto azul de ubicación */
         .user-location {
             width: 18px;
             height: 18px;
-            background: #1689ff;
+            background-color: #1689ff;
             border: 3px solid white;
             border-radius: 50%;
-            box-shadow: 0 0 0 3px rgba(22, 137, 255, 0.3);
+            box-shadow: 0 0 0 4px rgba(22, 137, 255, 0.25);
         }
+
+        /* Botón para cambiar tipo de mapa */
+        #layer-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+
+            z-index: 10;
+
+            background: white;
+            border: none;
+            border-radius: 10px;
+
+            padding: 10px 14px;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Menú de capas */
+        #layer-menu {
+            position: absolute;
+            top: 65px;
+            right: 15px;
+
+            z-index: 10;
+
+            background: white;
+            border-radius: 10px;
+
+            padding: 8px;
+
+            width: 150px;
+
+            display: none;
+
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .layer-option {
+            padding: 10px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+
+        .layer-option:hover {
+            background-color: #eeeeee;
+        }
+
     </style>
 </head>
 
@@ -44,75 +100,156 @@
 
     <div id="map"></div>
 
+    <button id="layer-button">
+        🗺️ Capas
+    </button>
+
+    <div id="layer-menu">
+
+        <div class="layer-option" data-style="streets">
+            Mapa
+        </div>
+
+        <div class="layer-option" data-style="satellite">
+            Satélite
+        </div>
+
+        <div class="layer-option" data-style="hybrid">
+            Satélite + calles
+        </div>
+
+    </div>
+
     <script>
 
-        // Creamos el mapa
-        const map = new maplibregl.Map({
-            container: 'map',
+        // =========================================================
+        // CONFIGURACIÓN MAPTILER
+        // =========================================================
 
-            style: 'https://demotiles.maplibre.org/style.json',
+        maptilersdk.config.apiKey = "lJBAab5ODxqdFUoXLLm8";
+
+
+        // =========================================================
+        // CREAR MAPA
+        // =========================================================
+
+        const map = new maptilersdk.Map({
+            container: "map",
+
+            style: maptilersdk.MapStyle.STREETS,
 
             center: [-3.7038, 40.4168],
 
-            zoom: 14
+            zoom: 15
         });
 
 
-        // Comprobamos si el navegador permite acceder a la ubicación
+        // =========================================================
+        // CONTROLES DEL MAPA
+        // =========================================================
+
+        map.addControl(
+            new maptilersdk.NavigationControl(),
+            "bottom-right"
+        );
+
+
+        // =========================================================
+        // UBICACIÓN DEL USUARIO
+        // =========================================================
+
+        let userMarker = null;
+
+
         if ("geolocation" in navigator) {
 
             navigator.geolocation.getCurrentPosition(
 
-                // Si conseguimos la ubicación
                 function(position) {
 
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
+                    const latitude =
+                        position.coords.latitude;
 
-                    console.log("Latitud:", latitude);
-                    console.log("Longitud:", longitude);
-                    console.log("Precisión:", position.coords.accuracy, "metros");
+                    const longitude =
+                        position.coords.longitude;
+
+                    const accuracy =
+                        position.coords.accuracy;
 
 
-                    // Centramos el mapa en nuestra ubicación
+                    console.log(
+                        "Latitud:",
+                        latitude
+                    );
+
+                    console.log(
+                        "Longitud:",
+                        longitude
+                    );
+
+                    console.log(
+                        "Precisión:",
+                        accuracy,
+                        "metros"
+                    );
+
+
+                    // Centramos el mapa
                     map.flyTo({
-                        center: [longitude, latitude],
-                        zoom: 17
+
+                        center: [
+                            longitude,
+                            latitude
+                        ],
+
+                        zoom: 18,
+
+                        essential: true
+
                     });
 
 
                     // Creamos el punto azul
-                    const markerElement = document.createElement("div");
+                    const markerElement =
+                        document.createElement("div");
 
-                    markerElement.className = "user-location";
+                    markerElement.className =
+                        "user-location";
 
 
-                    // Colocamos el punto azul en nuestra ubicación
-                    new maplibregl.Marker({
-                        element: markerElement
-                    })
-                    .setLngLat([longitude, latitude])
-                    .addTo(map);
+                    // Añadimos el marcador
+                    userMarker =
+                        new maptilersdk.Marker({
+                            element: markerElement
+                        })
+
+                        .setLngLat([
+                            longitude,
+                            latitude
+                        ])
+
+                        .addTo(map);
 
                 },
 
 
-                // Si ocurre un error
                 function(error) {
 
-                    console.error("Error obteniendo la ubicación:", error);
+                    console.error(
+                        "Error obteniendo ubicación:",
+                        error
+                    );
 
                     alert(
-                        "No se ha podido obtener tu ubicación. Comprueba que has dado permiso a la página."
+                        "No se ha podido obtener tu ubicación."
                     );
 
                 },
 
 
-                // Opciones de geolocalización
                 {
                     enableHighAccuracy: true,
-                    timeout: 10000,
+                    timeout: 15000,
                     maximumAge: 0
                 }
 
@@ -120,9 +257,117 @@
 
         } else {
 
-            alert("Este dispositivo no permite utilizar geolocalización.");
+            alert(
+                "Este dispositivo no permite utilizar geolocalización."
+            );
 
         }
+
+
+        // =========================================================
+        // MENÚ DE CAPAS
+        // =========================================================
+
+        const layerButton =
+            document.getElementById(
+                "layer-button"
+            );
+
+        const layerMenu =
+            document.getElementById(
+                "layer-menu"
+            );
+
+
+        layerButton.addEventListener(
+            "click",
+            function() {
+
+                if (
+                    layerMenu.style.display === "block"
+                ) {
+
+                    layerMenu.style.display =
+                        "none";
+
+                } else {
+
+                    layerMenu.style.display =
+                        "block";
+
+                }
+
+            }
+        );
+
+
+        // =========================================================
+        // CAMBIAR ESTILO DEL MAPA
+        // =========================================================
+
+        document
+            .querySelectorAll(
+                ".layer-option"
+            )
+            .forEach(function(option) {
+
+                option.addEventListener(
+                    "click",
+                    function() {
+
+                        const selectedStyle =
+                            this.dataset.style;
+
+
+                        if (
+                            selectedStyle ===
+                            "streets"
+                        ) {
+
+                            map.setStyle(
+                                maptilersdk
+                                    .MapStyle
+                                    .STREETS
+                            );
+
+                        }
+
+
+                        if (
+                            selectedStyle ===
+                            "satellite"
+                        ) {
+
+                            map.setStyle(
+                                maptilersdk
+                                    .MapStyle
+                                    .SATELLITE
+                            );
+
+                        }
+
+
+                        if (
+                            selectedStyle ===
+                            "hybrid"
+                        ) {
+
+                            map.setStyle(
+                                maptilersdk
+                                    .MapStyle
+                                    .HYBRID
+                            );
+
+                        }
+
+
+                        layerMenu.style.display =
+                            "none";
+
+                    }
+                );
+
+            });
 
     </script>
 
