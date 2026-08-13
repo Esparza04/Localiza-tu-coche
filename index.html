@@ -28,7 +28,7 @@
 
     <script>
         (function() {
-            const version = "2026-08-14-03";
+            const version = "2026-08-14-05";
 
             window.APP_PARKING_VERSION = version;
             window.APP_PARKING_RELOADING = false;
@@ -60,14 +60,14 @@
 
     <!-- MAPTILER -->
     <link
-        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-03"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-05"
         rel="stylesheet"
     >
 
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-03"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-05"></script>
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-03"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-05"></script>
 
 
     <style>
@@ -391,6 +391,11 @@
         #user-area {
             position: relative;
 
+            display: flex;
+            flex-direction: column;
+
+            gap: 7px;
+
             margin-right: 8px;
         }
 
@@ -418,8 +423,8 @@
         #user-menu {
             position: absolute;
 
-            top: 52px;
-            left: 0;
+            top: 0;
+            left: 52px;
 
             width: 230px;
 
@@ -434,6 +439,63 @@
             box-shadow:
                 0 3px 14px
                 rgba(0, 0, 0, 0.25);
+        }
+
+        .car-button-icon {
+            position: relative;
+
+            width: 24px;
+            height: 15px;
+
+            border-radius:
+                7px
+                7px
+                5px
+                5px;
+
+            background: #555555;
+        }
+
+        .car-button-icon::before {
+            content: "";
+
+            position: absolute;
+
+            top: -6px;
+            left: 5px;
+
+            width: 14px;
+            height: 8px;
+
+            border-radius:
+                7px
+                7px
+                0
+                0;
+
+            background: #555555;
+        }
+
+        .car-button-icon::after {
+            content: "";
+
+            position: absolute;
+
+            left: 4px;
+            bottom: -4px;
+
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #222222;
+
+            box-shadow:
+                11px
+                0
+                0
+                #222222;
         }
 
         #user-info {
@@ -776,8 +838,8 @@
         }
 
         .map-control {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
 
             display: flex;
             align-items: center;
@@ -960,7 +1022,9 @@
         }
 
         #open-create-vehicle {
-            background: #2388e8;
+            background: #eeeeee;
+
+            color: #333333;
         }
 
         #open-park-vehicle {
@@ -968,6 +1032,17 @@
         }
 
         .vehicle-marker {
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            cursor: pointer;
+        }
+
+        .vehicle-marker-icon {
             position: relative;
 
             width: 30px;
@@ -983,19 +1058,13 @@
             box-shadow:
                 0 2px 9px
                 rgba(0,0,0,0.34);
-
-            cursor: pointer;
         }
 
-        .vehicle-marker.dot {
+        .vehicle-marker-icon.dot {
             border-radius: 50%;
         }
 
-        .vehicle-marker.square {
-            border-radius: 7px;
-        }
-
-        .vehicle-marker.car {
+        .vehicle-marker-icon.car {
             width: 34px;
             height: 22px;
 
@@ -1006,7 +1075,7 @@
                 6px;
         }
 
-        .vehicle-marker.car::before {
+        .vehicle-marker-icon.car::before {
             content: "";
 
             position: absolute;
@@ -1033,7 +1102,7 @@
                 var(--vehicle-color, #2388e8);
         }
 
-        .vehicle-marker.car::after {
+        .vehicle-marker-icon.car::after {
             content: "";
 
             position: absolute;
@@ -1056,7 +1125,8 @@
         }
 
         .vehicle-popup {
-            min-width: 210px;
+            min-width: 260px;
+            max-width: 310px;
 
             color: #222222;
 
@@ -1076,6 +1146,10 @@
             color: #555555;
 
             font-size: 13px;
+        }
+
+        .vehicle-popup-line strong {
+            color: #333333;
         }
 
         .vehicle-popup-time {
@@ -1263,6 +1337,96 @@
             color: #777777;
 
             font-size: 12px;
+        }
+
+        .vehicles-filter-row {
+            margin-bottom: 13px;
+        }
+
+        .vehicles-filter-row label {
+            display: block;
+
+            margin-bottom: 6px;
+
+            color: #444444;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .vehicles-list {
+            max-height:
+                min(410px, calc(100vh - 250px));
+
+            overflow-y: auto;
+
+            display: grid;
+
+            gap: 9px;
+        }
+
+        .vehicle-list-item {
+            padding: 13px;
+
+            display: grid;
+
+            grid-template-columns:
+                42px
+                1fr;
+
+            gap: 12px;
+
+            align-items: center;
+
+            border:
+                1px solid
+                #e2e2e2;
+
+            border-radius: 11px;
+
+            background: #ffffff;
+        }
+
+        .vehicle-list-name {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .vehicle-list-meta {
+            margin-top: 4px;
+
+            color: #666666;
+
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .vehicle-status {
+            display: inline-flex;
+            align-items: center;
+
+            margin-top: 8px;
+
+            padding:
+                5px
+                8px;
+
+            border-radius: 999px;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .vehicle-status.parked {
+            color: #1f6f3f;
+
+            background: #e5f6ea;
+        }
+
+        .vehicle-status.unparked {
+            color: #606060;
+
+            background: #eeeeee;
         }
 
         .parking-center-marker {
@@ -1593,9 +1757,17 @@
                 height: 42px;
             }
 
+            #user-menu {
+                left: 50px;
+            }
+
             .map-control {
-                width: 40px;
-                height: 40px;
+                width: 42px;
+                height: 42px;
+            }
+
+            #group-button {
+                height: 42px;
             }
 
             #bottom-actions {
@@ -1873,6 +2045,15 @@
                 P
             </button>
 
+            <button
+                id="open-vehicles-panel"
+                class="square-button"
+                type="button"
+                aria-label="Ver vehículos"
+            >
+                <span class="car-button-icon"></span>
+            </button>
+
             <div id="user-menu">
 
                 <div id="user-info">
@@ -2047,7 +2228,7 @@
             class="bottom-action-button"
             type="button"
         >
-            + Vehículo
+            Añadir vehículo
         </button>
 
         <button
@@ -2233,6 +2414,57 @@
 
 
 <!-- =========================================================
+     MODAL VEHICULOS
+========================================================= -->
+
+<div
+    id="vehicles-modal"
+    class="modal-background"
+>
+
+    <div class="modal">
+
+        <h2>
+            Vehículos
+        </h2>
+
+        <div class="vehicles-filter-row">
+
+            <label>
+                Grupo
+            </label>
+
+            <select
+                id="vehicles-filter"
+                class="select-input"
+            ></select>
+
+        </div>
+
+        <div
+            id="vehicles-list"
+            class="vehicles-list"
+        ></div>
+
+        <div class="modal-buttons">
+
+            <button
+                id="close-vehicles-panel"
+                class="modal-create-button"
+                type="button"
+            >
+                Listo
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
      MODAL CREAR VEHICULO
 ========================================================= -->
 
@@ -2303,11 +2535,7 @@
                     class="select-input"
                 >
                     <option value="dot">
-                        Punto
-                    </option>
-
-                    <option value="square">
-                        Cuadrado
+                        Círculo
                     </option>
 
                     <option value="car">
@@ -2344,9 +2572,13 @@
 
                 <div
                     id="vehicle-marker-preview"
-                    class="vehicle-marker dot"
-                    style="--vehicle-color: #2388E8;"
-                ></div>
+                    class="vehicle-marker"
+                >
+                    <div
+                        class="vehicle-marker-icon dot"
+                        style="--vehicle-color: #2388E8;"
+                    ></div>
+                </div>
 
                 <span class="modal-text">
                     Así se verá en el mapa.
@@ -2464,7 +2696,7 @@
 
         const APP_VERSION =
             window.APP_PARKING_VERSION ||
-            "2026-08-14-03";
+            "2026-08-14-05";
 
         const APP_VERSION_STORAGE_KEY =
             "app-parking-version";
@@ -2620,6 +2852,21 @@
 
         const centerLocationButton =
             document.getElementById("center-location-button");
+
+        const openVehiclesPanelButton =
+            document.getElementById("open-vehicles-panel");
+
+        const vehiclesModal =
+            document.getElementById("vehicles-modal");
+
+        const vehiclesFilterSelect =
+            document.getElementById("vehicles-filter");
+
+        const vehiclesList =
+            document.getElementById("vehicles-list");
+
+        const closeVehiclesPanelButton =
+            document.getElementById("close-vehicles-panel");
 
         const openCreateVehicleButton =
             document.getElementById("open-create-vehicle");
@@ -3840,6 +4087,10 @@
                 if (parkVehicleModal.style.display === "flex") {
                     renderParkVehicleList();
                 }
+
+                if (vehiclesModal.style.display === "flex") {
+                    renderVehiclesPanelList();
+                }
             }
 
             catch (error) {
@@ -3865,7 +4116,7 @@
         function normalizeVehicle(vehicle) {
 
             const markerType =
-                ["dot", "square", "car"].includes(
+                ["dot", "car"].includes(
                     vehicle.marker_type
                 )
                     ? vehicle.marker_type
@@ -4012,6 +4263,10 @@
                 parkVehicleModal.style.display = "none";
             }
 
+            if (vehiclesModal) {
+                vehiclesModal.style.display = "none";
+            }
+
         }
 
 
@@ -4058,7 +4313,10 @@
                     const marker =
                         new maptilersdk.Marker({
                             element:
-                                markerElement
+                                markerElement,
+
+                            anchor:
+                                "center"
                         })
                             .setLngLat([
                                 vehicle.longitude,
@@ -4098,16 +4356,33 @@
                 return false;
             }
 
-            if (selectedGroupId === "all") {
+            return isVehicleInCurrentFilter(vehicle);
+
+        }
+
+
+        function isVehicleInCurrentFilter(vehicle) {
+
+            return isVehicleInFilter(
+                vehicle,
+                selectedGroupId
+            );
+
+        }
+
+
+        function isVehicleInFilter(vehicle, filterId) {
+
+            if (filterId === "all") {
                 return true;
             }
 
-            if (selectedGroupId === "personal") {
+            if (filterId === "personal") {
                 return vehicle.group_ids.length === 0;
             }
 
             return vehicle.group_ids.includes(
-                selectedGroupId
+                filterId
             );
 
         }
@@ -4119,17 +4394,287 @@
                 document.createElement("div");
 
             markerElement.className =
-                "vehicle-marker " + vehicle.marker_type;
+                "vehicle-marker";
 
-            markerElement.style.setProperty(
+            const markerIcon =
+                document.createElement("div");
+
+            markerIcon.className =
+                "vehicle-marker-icon " + vehicle.marker_type;
+
+            markerIcon.style.setProperty(
                 "--vehicle-color",
                 vehicle.marker_color
             );
+
+            markerElement.appendChild(markerIcon);
 
             markerElement.title =
                 vehicle.name;
 
             return markerElement;
+
+        }
+
+
+        async function openVehiclesPanel() {
+
+            userMenu.style.display = "none";
+            groupMenu.style.display = "none";
+            layerMenu.style.display = "none";
+
+            await loadVehicles(false);
+
+            renderVehiclesPanelFilter();
+            renderVehiclesPanelList();
+
+            vehiclesModal.style.display =
+                "flex";
+
+        }
+
+
+        function closeVehiclesPanel() {
+
+            vehiclesModal.style.display =
+                "none";
+
+        }
+
+
+        function renderVehiclesPanelFilter() {
+
+            const previousValue =
+                vehiclesFilterSelect.value ||
+                selectedGroupId ||
+                "all";
+
+            vehiclesFilterSelect.innerHTML =
+                "";
+
+            appendVehiclesFilterOption(
+                "all",
+                "Todos"
+            );
+
+            appendVehiclesFilterOption(
+                "personal",
+                "Personal"
+            );
+
+            userGroups.forEach(
+                function(group) {
+                    appendVehiclesFilterOption(
+                        group.id,
+                        group.name
+                    );
+                }
+            );
+
+            const hasPreviousValue =
+                Array
+                    .from(vehiclesFilterSelect.options)
+                    .some(
+                        function(option) {
+                            return option.value === previousValue;
+                        }
+                    );
+
+            vehiclesFilterSelect.value =
+                hasPreviousValue
+                    ? previousValue
+                    : "all";
+
+        }
+
+
+        function appendVehiclesFilterOption(value, label) {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                value;
+
+            option.textContent =
+                label;
+
+            vehiclesFilterSelect.appendChild(option);
+
+        }
+
+
+        function renderVehiclesPanelList() {
+
+            vehiclesList.innerHTML =
+                "";
+
+            const filterId =
+                vehiclesFilterSelect.value || "all";
+
+            const visibleVehicles =
+                vehicles.filter(
+                    function(vehicle) {
+                        return isVehicleInFilter(
+                            vehicle,
+                            filterId
+                        );
+                    }
+                );
+
+            if (visibleVehicles.length === 0) {
+                const empty =
+                    document.createElement("div");
+
+                empty.className =
+                    "vehicle-empty-state";
+
+                empty.textContent =
+                    "No hay vehículos en " +
+                    getVehiclesPanelFilterName() +
+                    ".";
+
+                vehiclesList.appendChild(empty);
+
+                return;
+            }
+
+            visibleVehicles.forEach(
+                function(vehicle) {
+                    vehiclesList.appendChild(
+                        createVehiclesPanelItem(vehicle)
+                    );
+                }
+            );
+
+        }
+
+
+        function createVehiclesPanelItem(vehicle) {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "vehicle-list-item";
+
+            const markerPreview =
+                createVehicleMarkerElement(vehicle);
+
+            const details =
+                document.createElement("div");
+
+            const name =
+                document.createElement("div");
+
+            name.className =
+                "vehicle-list-name";
+
+            name.textContent =
+                vehicle.name;
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "vehicle-list-meta";
+
+            meta.textContent =
+                getVehiclePanelMetaText(vehicle);
+
+            const status =
+                document.createElement("div");
+
+            status.className =
+                vehicle.is_parked
+                    ? "vehicle-status parked"
+                    : "vehicle-status unparked";
+
+            status.textContent =
+                vehicle.is_parked
+                    ? "Aparcado · " +
+                        formatElapsedTime(vehicle.parked_at)
+                    : "Sin aparcar";
+
+            details.appendChild(name);
+            details.appendChild(meta);
+            details.appendChild(status);
+
+            item.appendChild(markerPreview);
+            item.appendChild(details);
+
+            return item;
+
+        }
+
+
+        function getVehiclePanelMetaText(vehicle) {
+
+            const parts =
+                [];
+
+            if (vehicle.plate) {
+                parts.push(vehicle.plate);
+            }
+
+            parts.push(
+                getVehicleGroupText(vehicle)
+            );
+
+            return parts.join(" · ");
+
+        }
+
+
+        function getVehicleGroupText(vehicle) {
+
+            if (vehicle.group_ids.length === 0) {
+                return "Personal";
+            }
+
+            const names =
+                vehicle.group_ids
+                    .map(getGroupNameById)
+                    .filter(Boolean);
+
+            if (names.length > 0) {
+                return names.join(", ");
+            }
+
+            return (
+                vehicle.group_ids.length === 1
+                    ? "1 grupo"
+                    : vehicle.group_ids.length + " grupos"
+            );
+
+        }
+
+
+        function getGroupNameById(groupId) {
+
+            const group =
+                userGroups.find(
+                    function(item) {
+                        return item.id === groupId;
+                    }
+                );
+
+            return group ? group.name : "";
+
+        }
+
+
+        function getVehiclesPanelFilterName() {
+
+            const selectedOption =
+                vehiclesFilterSelect
+                    .options[
+                        vehiclesFilterSelect.selectedIndex
+                    ];
+
+            return selectedOption
+                ? selectedOption.textContent
+                : "este grupo";
 
         }
 
@@ -4245,12 +4790,23 @@
                 );
 
             vehicleMarkerPreview.className =
-                "vehicle-marker " + markerType;
+                "vehicle-marker";
 
-            vehicleMarkerPreview.style.setProperty(
+            vehicleMarkerPreview.innerHTML =
+                "";
+
+            const markerIcon =
+                document.createElement("div");
+
+            markerIcon.className =
+                "vehicle-marker-icon " + markerType;
+
+            markerIcon.style.setProperty(
                 "--vehicle-color",
                 markerColor
             );
+
+            vehicleMarkerPreview.appendChild(markerIcon);
 
         }
 
@@ -4414,7 +4970,10 @@
             const availableVehicles =
                 vehicles.filter(
                     function(vehicle) {
-                        return !vehicle.is_parked;
+                        return (
+                            !vehicle.is_parked &&
+                            isVehicleInCurrentFilter(vehicle)
+                        );
                     }
                 );
 
@@ -4425,14 +4984,28 @@
                 empty.className =
                     "vehicle-empty-state";
 
+                const vehiclesInFilter =
+                    vehicles.filter(
+                        isVehicleInCurrentFilter
+                    );
+
                 if (vehicles.length === 0) {
                     empty.textContent =
                         "Todavía no tienes vehículos accesibles. Crea uno primero.";
                 }
 
+                else if (vehiclesInFilter.length === 0) {
+                    empty.textContent =
+                        "No hay vehículos en " +
+                        getCurrentFilterName() +
+                        ".";
+                }
+
                 else {
                     empty.textContent =
-                        "Todos los vehículos accesibles ya están aparcados.";
+                        "Todos los vehículos de " +
+                        getCurrentFilterName() +
+                        " ya están aparcados.";
                 }
 
                 parkVehicleList.appendChild(empty);
@@ -4521,6 +5094,19 @@
             }
 
             return parts.join(" · ");
+
+        }
+
+
+        function getCurrentFilterName() {
+
+            const filterName =
+                selectedGroup &&
+                selectedGroup.textContent
+                    ? selectedGroup.textContent.trim()
+                    : "";
+
+            return filterName || "este filtro";
 
         }
 
@@ -4763,7 +5349,7 @@
                 "vehicle-popup-line vehicle-popup-time";
 
             started.textContent =
-                "Inicio: " +
+                "Hora de inicio: " +
                 formatParkedAt(vehicle.parked_at);
 
             container.appendChild(started);
@@ -4778,7 +5364,7 @@
                 vehicle.parked_at || "";
 
             elapsed.textContent =
-                "Tiempo: " +
+                "Tiempo de estacionamiento: " +
                 formatElapsedTime(vehicle.parked_at);
 
             container.appendChild(elapsed);
@@ -4884,7 +5470,7 @@
                 .forEach(
                     function(element) {
                         element.textContent =
-                            "Tiempo: " +
+                            "Tiempo de estacionamiento: " +
                             formatElapsedTime(
                                 element.dataset.parkedAt
                             );
@@ -4967,25 +5553,35 @@
             const minutes =
                 totalMinutes % 60;
 
+            const parts =
+                [];
+
             if (days > 0) {
-                return (
+                parts.push(
                     days +
-                    " d " +
+                    (
+                        days === 1
+                            ? " día"
+                            : " días"
+                    )
+                );
+            }
+
+            if (hours > 0) {
+                parts.push(
                     hours +
                     " h"
                 );
             }
 
-            if (hours > 0) {
-                return (
-                    hours +
-                    " h " +
+            if (minutes > 0) {
+                parts.push(
                     minutes +
                     " min"
                 );
             }
 
-            return minutes + " min";
+            return parts.join(" ");
 
         }
 
@@ -5391,6 +5987,21 @@
                 centerOnUserLocation
             );
 
+            openVehiclesPanelButton.addEventListener(
+                "click",
+                openVehiclesPanel
+            );
+
+            closeVehiclesPanelButton.addEventListener(
+                "click",
+                closeVehiclesPanel
+            );
+
+            vehiclesFilterSelect.addEventListener(
+                "change",
+                renderVehiclesPanelList
+            );
+
             openCreateVehicleButton.addEventListener(
                 "click",
                 openCreateVehicleModal
@@ -5521,6 +6132,15 @@
                 function(event) {
                     if (event.target === parkVehicleModal) {
                         closeParkVehicleModal();
+                    }
+                }
+            );
+
+            vehiclesModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === vehiclesModal) {
+                        closeVehiclesPanel();
                     }
                 }
             );
