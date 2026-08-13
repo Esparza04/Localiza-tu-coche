@@ -1,13 +1,131 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Localiza tu coche</title>
+
+    <!-- MapLibre GL JS -->
+    <link
+        href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css"
+        rel="stylesheet"
+    >
+
+    <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .user-location {
+            width: 18px;
+            height: 18px;
+            background: #1689ff;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(22, 137, 255, 0.3);
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Localiza tu coche</h1>
-    <p>La aplicación está funcionando correctamente.</p>
+
+    <div id="map"></div>
+
+    <script>
+
+        // Creamos el mapa
+        const map = new maplibregl.Map({
+            container: 'map',
+
+            style: 'https://demotiles.maplibre.org/style.json',
+
+            center: [-3.7038, 40.4168],
+
+            zoom: 14
+        });
+
+
+        // Comprobamos si el navegador permite acceder a la ubicación
+        if ("geolocation" in navigator) {
+
+            navigator.geolocation.getCurrentPosition(
+
+                // Si conseguimos la ubicación
+                function(position) {
+
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    console.log("Latitud:", latitude);
+                    console.log("Longitud:", longitude);
+                    console.log("Precisión:", position.coords.accuracy, "metros");
+
+
+                    // Centramos el mapa en nuestra ubicación
+                    map.flyTo({
+                        center: [longitude, latitude],
+                        zoom: 17
+                    });
+
+
+                    // Creamos el punto azul
+                    const markerElement = document.createElement("div");
+
+                    markerElement.className = "user-location";
+
+
+                    // Colocamos el punto azul en nuestra ubicación
+                    new maplibregl.Marker({
+                        element: markerElement
+                    })
+                    .setLngLat([longitude, latitude])
+                    .addTo(map);
+
+                },
+
+
+                // Si ocurre un error
+                function(error) {
+
+                    console.error("Error obteniendo la ubicación:", error);
+
+                    alert(
+                        "No se ha podido obtener tu ubicación. Comprueba que has dado permiso a la página."
+                    );
+
+                },
+
+
+                // Opciones de geolocalización
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+
+            );
+
+        } else {
+
+            alert("Este dispositivo no permite utilizar geolocalización.");
+
+        }
+
+    </script>
+
 </body>
+
 </html>
