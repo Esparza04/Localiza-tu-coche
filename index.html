@@ -11,7 +11,6 @@
 
     <title>Localiza tu coche</title>
 
-    <!-- MAPTILER -->
     <link
         href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css"
         rel="stylesheet"
@@ -19,9 +18,7 @@
 
     <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js"></script>
 
-    <!-- SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 
     <style>
 
@@ -42,22 +39,19 @@
             overflow: hidden;
         }
 
-
         button,
         input,
         textarea {
             font-family: inherit;
         }
 
-
         button {
             cursor: pointer;
         }
 
-
-        /* =====================================================
-           CARGA INICIAL
-        ===================================================== */
+        /* =========================
+           CARGA
+        ========================== */
 
         #loading-screen {
             position: fixed;
@@ -72,7 +66,6 @@
             background: #f5f5f5;
         }
 
-
         .loader {
             width: 40px;
             height: 40px;
@@ -85,19 +78,15 @@
             animation: spin 0.8s linear infinite;
         }
 
-
         @keyframes spin {
-
             to {
                 transform: rotate(360deg);
             }
-
         }
 
-
-        /* =====================================================
+        /* =========================
            AUTENTICACIÓN
-        ===================================================== */
+        ========================== */
 
         #auth-screen {
             position: fixed;
@@ -112,14 +101,12 @@
 
             padding: 24px;
 
-            background:
-                linear-gradient(
-                    145deg,
-                    #eef6ff,
-                    #ffffff
-                );
+            background: linear-gradient(
+                145deg,
+                #eef6ff,
+                #ffffff
+            );
         }
-
 
         .auth-card {
             width: 100%;
@@ -135,7 +122,6 @@
                 0 10px 35px
                 rgba(0, 0, 0, 0.12);
         }
-
 
         .auth-logo {
             width: 58px;
@@ -156,7 +142,6 @@
             font-size: 29px;
         }
 
-
         .auth-title {
             margin: 0;
 
@@ -164,7 +149,6 @@
 
             font-size: 26px;
         }
-
 
         .auth-subtitle {
             margin:
@@ -178,11 +162,9 @@
             font-size: 14px;
         }
 
-
         .form-group {
             margin-bottom: 15px;
         }
-
 
         .form-group label {
             display: block;
@@ -195,10 +177,8 @@
             color: #444444;
         }
 
-
         .form-group input,
         .form-group textarea {
-
             width: 100%;
 
             padding: 13px 14px;
@@ -216,17 +196,12 @@
             background: white;
         }
 
-
         .form-group input:focus,
         .form-group textarea:focus {
-
             border-color: #2388e8;
-
         }
 
-
         .primary-button {
-
             width: 100%;
 
             padding: 14px;
@@ -245,9 +220,7 @@
             font-weight: bold;
         }
 
-
         .auth-change {
-
             margin-top: 22px;
 
             text-align: center;
@@ -257,9 +230,7 @@
             color: #666666;
         }
 
-
         .auth-change button {
-
             border: none;
 
             background: transparent;
@@ -271,9 +242,7 @@
             font-size: 14px;
         }
 
-
         .auth-message {
-
             display: none;
 
             margin-bottom: 15px;
@@ -287,9 +256,7 @@
             line-height: 1.4;
         }
 
-
         .auth-message.error {
-
             display: block;
 
             color: #a71919;
@@ -297,9 +264,7 @@
             background: #ffe8e8;
         }
 
-
         .auth-message.success {
-
             display: block;
 
             color: #176329;
@@ -307,16 +272,13 @@
             background: #e5f7e9;
         }
 
-
         #register-form {
             display: none;
         }
 
-
-
-        /* =====================================================
-           APLICACIÓN
-        ===================================================== */
+        /* =========================
+           APP
+        ========================== */
 
         #app {
             position: fixed;
@@ -325,9 +287,7 @@
             display: none;
         }
 
-
         #map {
-
             position: absolute;
             inset: 0;
 
@@ -335,14 +295,11 @@
             height: 100%;
         }
 
-
-
-        /* =====================================================
+        /* =========================
            BARRA SUPERIOR
-        ===================================================== */
+        ========================== */
 
         #top-interface {
-
             position: absolute;
 
             top: 15px;
@@ -358,29 +315,22 @@
             pointer-events: none;
         }
 
-
         #top-interface button,
         #top-interface div {
-
             pointer-events: auto;
         }
 
-
-
-        /* =====================================================
+        /* =========================
            USUARIO
-        ===================================================== */
+        ========================== */
 
         #user-area {
-
             position: relative;
 
             margin-right: 8px;
         }
 
-
         .square-button {
-
             width: 44px;
             height: 44px;
 
@@ -401,9 +351,7 @@
             font-size: 20px;
         }
 
-
         #user-menu {
-
             position: absolute;
 
             top: 52px;
@@ -424,9 +372,7 @@
                 rgba(0, 0, 0, 0.25);
         }
 
-
         #user-info {
-
             padding: 10px;
 
             border-bottom:
@@ -434,17 +380,13 @@
                 #eeeeee;
         }
 
-
         #user-name {
-
             font-weight: bold;
 
             font-size: 14px;
         }
 
-
         #user-email {
-
             margin-top: 3px;
 
             color: #777777;
@@ -456,9 +398,7 @@
             text-overflow: ellipsis;
         }
 
-
         .menu-button {
-
             width: 100%;
 
             padding: 11px;
@@ -474,26 +414,19 @@
             font-size: 14px;
         }
 
-
         .menu-button:hover {
-
             background: #f1f1f1;
         }
 
-
         .danger {
-
             color: #c62828;
         }
 
-
-
-        /* =====================================================
-           SELECTOR DE GRUPOS
-        ===================================================== */
+        /* =========================
+           GRUPOS
+        ========================== */
 
         #group-area {
-
             position: relative;
 
             flex: 1;
@@ -502,9 +435,7 @@
             justify-content: center;
         }
 
-
         #group-button {
-
             min-width: 140px;
             max-width: 210px;
 
@@ -534,9 +465,7 @@
             font-weight: 600;
         }
 
-
         #group-menu {
-
             position: absolute;
 
             top: 52px;
@@ -559,9 +488,7 @@
                 rgba(0, 0, 0, 0.28);
         }
 
-
         .group-option {
-
             width: 100%;
 
             padding: 12px;
@@ -577,15 +504,11 @@
             font-size: 15px;
         }
 
-
         .group-option:hover {
-
             background: #f1f1f1;
         }
 
-
         .menu-separator {
-
             height: 1px;
 
             margin: 6px 5px;
@@ -593,9 +516,7 @@
             background: #eeeeee;
         }
 
-
         .join-title {
-
             padding:
                 7px
                 10px
@@ -607,9 +528,7 @@
             font-weight: bold;
         }
 
-
         #join-row {
-
             display: flex;
 
             gap: 6px;
@@ -617,9 +536,7 @@
             padding: 5px;
         }
 
-
         #join-code {
-
             min-width: 0;
 
             flex: 1;
@@ -639,9 +556,7 @@
             text-transform: uppercase;
         }
 
-
         #paste-code {
-
             padding:
                 0
                 10px;
@@ -653,9 +568,7 @@
             background: #eeeeee;
         }
 
-
         #join-group-button {
-
             width:
                 calc(100% - 10px);
 
@@ -677,14 +590,11 @@
             font-weight: bold;
         }
 
-
-
-        /* =====================================================
+        /* =========================
            CONTROLES MAPA
-        ===================================================== */
+        ========================== */
 
         #map-controls {
-
             display: flex;
 
             flex-direction: column;
@@ -694,9 +604,7 @@
             margin-left: 8px;
         }
 
-
         .map-control {
-
             width: 42px;
             height: 42px;
 
@@ -715,21 +623,14 @@
                 rgba(0, 0, 0, 0.25);
         }
 
-
-
-        /* ICONO CAPAS */
-
         .layers-icon {
-
             position: relative;
 
             width: 19px;
             height: 19px;
         }
 
-
         .layers-icon span {
-
             position: absolute;
 
             left: 50%;
@@ -750,7 +651,6 @@
                 rotate(45deg);
         }
 
-
         .layers-icon span:nth-child(1) {
             top: 0;
         }
@@ -763,12 +663,7 @@
             top: 6px;
         }
 
-
-
-        /* UBICACIÓN */
-
         .location-arrow {
-
             width: 0;
             height: 0;
 
@@ -785,12 +680,7 @@
                 rotate(45deg);
         }
 
-
-
-        /* MENÚ CAPAS */
-
         #layer-menu {
-
             position: absolute;
 
             top: 0;
@@ -811,9 +701,7 @@
                 rgba(0, 0, 0, 0.25);
         }
 
-
         .layer-option {
-
             padding: 11px;
 
             border-radius: 8px;
@@ -823,20 +711,15 @@
             cursor: pointer;
         }
 
-
         .layer-option:hover {
-
             background: #eeeeee;
         }
 
-
-
-        /* =====================================================
-           UBICACIÓN USUARIO
-        ===================================================== */
+        /* =========================
+           PUNTO AZUL
+        ========================== */
 
         .user-location {
-
             width: 18px;
             height: 18px;
 
@@ -855,14 +738,11 @@
                 rgba(0,0,0,0.3);
         }
 
-
-
-        /* =====================================================
+        /* =========================
            MODALES
-        ===================================================== */
+        ========================== */
 
         .modal-background {
-
             position: fixed;
             inset: 0;
 
@@ -879,9 +759,7 @@
                 rgba(0,0,0,0.38);
         }
 
-
         .modal {
-
             width: 100%;
             max-width: 420px;
 
@@ -896,9 +774,7 @@
                 rgba(0,0,0,0.25);
         }
 
-
         .modal h2 {
-
             margin:
                 0
                 0
@@ -907,9 +783,7 @@
             font-size: 21px;
         }
 
-
         .modal-buttons {
-
             display: flex;
 
             justify-content: flex-end;
@@ -919,9 +793,7 @@
             margin-top: 20px;
         }
 
-
         .secondary-button {
-
             padding:
                 11px
                 16px;
@@ -935,9 +807,7 @@
             font-weight: bold;
         }
 
-
         .modal-create-button {
-
             padding:
                 11px
                 18px;
@@ -953,13 +823,11 @@
             font-weight: bold;
         }
 
-
-        /* =====================================================
-           MENSAJES
-        ===================================================== */
+        /* =========================
+           TOAST
+        ========================== */
 
         #toast {
-
             position: fixed;
 
             left: 50%;
@@ -992,576 +860,1948 @@
                 rgba(0,0,0,0.25);
         }
 
-
-        @media (max-width: 500px) {
-
-            #top-interface {
-
-                top: 12px;
-                left: 12px;
-                right: 12px;
-            }
-
-
-            .square-button,
-            #group-button {
-
-                height: 42px;
-            }
-
-
-            .square-button {
-
-                width: 42px;
-            }
-
-
-            #group-button {
-
-                min-width: 125px;
-                max-width: 175px;
-            }
-
-
-            .map-control {
-
-                width: 40px;
-                height: 40px;
-            }
-
-        }
-
     </style>
-
 </head>
-
 
 <body>
 
-
-<!-- =========================================================
-     CARGA
-========================================================= -->
-
-<div id="loading-screen">
-
-    <div class="loader"></div>
-
-</div>
+    <div id="loading-screen">
+        <div class="loader"></div>
+    </div>
 
 
+    <div id="auth-screen">
 
-<!-- =========================================================
-     AUTENTICACIÓN
-========================================================= -->
+        <div class="auth-card">
 
-<div id="auth-screen">
-
-    <div class="auth-card">
-
-        <div class="auth-logo">
-            P
-        </div>
-
-        <h1 class="auth-title">
-            Localiza tu coche
-        </h1>
-
-        <p class="auth-subtitle">
-            Tus vehículos, siempre localizados.
-        </p>
-
-
-        <!-- LOGIN -->
-
-        <form id="login-form">
-
-            <div
-                id="login-message"
-                class="auth-message"
-            ></div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Correo electrónico
-                </label>
-
-                <input
-                    id="login-email"
-                    type="email"
-                    autocomplete="email"
-                    required
-                >
-
+            <div class="auth-logo">
+                P
             </div>
 
+            <h1 class="auth-title">
+                Localiza tu coche
+            </h1>
 
-            <div class="form-group">
-
-                <label>
-                    Contraseña
-                </label>
-
-                <input
-                    id="login-password"
-                    type="password"
-                    autocomplete="current-password"
-                    required
-                >
-
-            </div>
+            <p class="auth-subtitle">
+                Tus vehículos, siempre localizados.
+            </p>
 
 
-            <button
-                class="primary-button"
-                type="submit"
-            >
-                Iniciar sesión
-            </button>
+            <form id="login-form">
+
+                <div
+                    id="login-message"
+                    class="auth-message"
+                ></div>
 
 
-            <div class="auth-change">
+                <div class="form-group">
 
-                ¿No tienes una cuenta?
+                    <label>
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        id="login-email"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Contraseña
+                    </label>
+
+                    <input
+                        id="login-password"
+                        type="password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
 
                 <button
-                    id="show-register"
-                    type="button"
-                >
-                    Crear cuenta
-                </button>
-
-            </div>
-
-        </form>
-
-
-
-        <!-- REGISTRO -->
-
-        <form id="register-form">
-
-            <div
-                id="register-message"
-                class="auth-message"
-            ></div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Nombre
-                </label>
-
-                <input
-                    id="register-first-name"
-                    type="text"
-                    autocomplete="given-name"
-                    required
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Apellidos
-                </label>
-
-                <input
-                    id="register-last-name"
-                    type="text"
-                    autocomplete="family-name"
-                    required
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Correo electrónico
-                </label>
-
-                <input
-                    id="register-email"
-                    type="email"
-                    autocomplete="email"
-                    required
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Contraseña
-                </label>
-
-                <input
-                    id="register-password"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Repetir contraseña
-                </label>
-
-                <input
-                    id="register-password-repeat"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                >
-
-            </div>
-
-
-            <button
-                class="primary-button"
-                type="submit"
-            >
-                Crear cuenta
-            </button>
-
-
-            <div class="auth-change">
-
-                ¿Ya tienes una cuenta?
-
-                <button
-                    id="show-login"
-                    type="button"
+                    class="primary-button"
+                    type="submit"
                 >
                     Iniciar sesión
                 </button>
 
-            </div>
 
-        </form>
+                <div class="auth-change">
 
-    </div>
-
-</div>
-
-
-
-<!-- =========================================================
-     APLICACIÓN
-========================================================= -->
-
-<div id="app">
-
-    <div id="map"></div>
-
-
-    <div id="top-interface">
-
-
-        <!-- USUARIO -->
-
-        <div id="user-area">
-
-            <button
-                id="user-button"
-                class="square-button"
-                aria-label="Usuario"
-            >
-                ♙
-            </button>
-
-
-            <div id="user-menu">
-
-                <div id="user-info">
-
-                    <div id="user-name">
-                        Usuario
-                    </div>
-
-                    <div id="user-email"></div>
-
-                </div>
-
-
-                <button
-                    id="logout-button"
-                    class="menu-button danger"
-                >
-                    Cerrar sesión
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- GRUPOS -->
-
-        <div id="group-area">
-
-            <button id="group-button">
-
-                <span id="selected-group">
-                    Todos
-                </span>
-
-                <span>⌄</span>
-
-            </button>
-
-
-            <div id="group-menu">
-
-
-                <button
-                    class="group-option"
-                    data-group="all"
-                >
-                    Todos
-                </button>
-
-
-                <button
-                    class="group-option"
-                    data-group="personal"
-                >
-                    Personal
-                </button>
-
-
-                <div class="menu-separator"></div>
-
-
-                <button
-                    id="open-create-group"
-                    class="group-option"
-                >
-                    + Crear grupo
-                </button>
-
-
-                <div class="menu-separator"></div>
-
-
-                <div class="join-title">
-                    UNIRSE A UN GRUPO
-                </div>
-
-
-                <div id="join-row">
-
-                    <input
-                        id="join-code"
-                        type="text"
-                        placeholder="Código"
-                    >
+                    ¿No tienes una cuenta?
 
                     <button
-                        id="paste-code"
+                        id="show-register"
                         type="button"
                     >
-                        Pegar
+                        Crear cuenta
                     </button>
 
                 </div>
 
+            </form>
+
+
+            <form id="register-form">
+
+                <div
+                    id="register-message"
+                    class="auth-message"
+                ></div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Nombre
+                    </label>
+
+                    <input
+                        id="register-first-name"
+                        type="text"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Apellidos
+                    </label>
+
+                    <input
+                        id="register-last-name"
+                        type="text"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        id="register-email"
+                        type="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Contraseña
+                    </label>
+
+                    <input
+                        id="register-password"
+                        type="password"
+                        minlength="8"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Repetir contraseña
+                    </label>
+
+                    <input
+                        id="register-password-repeat"
+                        type="password"
+                        minlength="8"
+                        required
+                    >
+
+                </div>
+
 
                 <button
-                    id="join-group-button"
-                    type="button"
+                    class="primary-button"
+                    type="submit"
                 >
-                    Unirse
+                    Crear cuenta
                 </button>
 
 
-            </div>
+                <div class="auth-change">
 
-        </div>
+                    ¿Ya tienes una cuenta?
 
-
-
-        <!-- MAPA -->
-
-        <div id="map-controls">
-
-
-            <button
-                id="layer-button"
-                class="map-control"
-                aria-label="Capas"
-            >
-
-                <div class="layers-icon">
-
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <button
+                        id="show-login"
+                        type="button"
+                    >
+                        Iniciar sesión
+                    </button>
 
                 </div>
 
-            </button>
-
-
-            <button
-                id="center-location-button"
-                class="map-control"
-                aria-label="Centrar ubicación"
-            >
-
-                <div class="location-arrow"></div>
-
-            </button>
-
-
-            <div id="layer-menu">
-
-                <div
-                    class="layer-option"
-                    data-style="streets"
-                >
-                    Mapa
-                </div>
-
-                <div
-                    class="layer-option"
-                    data-style="satellite"
-                >
-                    Satélite
-                </div>
-
-                <div
-                    class="layer-option"
-                    data-style="hybrid"
-                >
-                    Satélite + calles
-                </div>
-
-            </div>
-
+            </form>
 
         </div>
 
     </div>
 
-</div>
+
+    <div id="app">
+
+        <div id="map"></div>
 
 
+        <div id="top-interface">
 
-<!-- =========================================================
-     CREAR GRUPO
-========================================================= -->
+            <div id="user-area">
 
-<div
-    id="create-group-modal"
-    class="modal-background"
->
-
-    <div class="modal">
-
-        <h2>
-            Crear grupo
-        </h2>
+                <button
+                    id="user-button"
+                    class="square-button"
+                >
+                    ♙
+                </button>
 
 
-        <div class="form-group">
+                <div id="user-menu">
 
-            <label>
-                Nombre del grupo
-            </label>
+                    <div id="user-info">
 
-            <input
-                id="new-group-name"
-                type="text"
-                maxlength="50"
-                placeholder="Ej. Familia"
-            >
+                        <div id="user-name">
+                            Usuario
+                        </div>
 
-        </div>
+                        <div id="user-email"></div>
+
+                    </div>
 
 
-        <div class="form-group">
+                    <button
+                        id="logout-button"
+                        class="menu-button danger"
+                    >
+                        Cerrar sesión
+                    </button>
 
-            <label>
-                Descripción
-            </label>
+                </div>
 
-            <textarea
-                id="new-group-description"
-                rows="3"
-                maxlength="250"
-                placeholder="Opcional"
-            ></textarea>
-
-        </div>
+            </div>
 
 
-        <div class="modal-buttons">
+            <div id="group-area">
 
-            <button
-                id="cancel-create-group"
-                class="secondary-button"
-            >
-                Cancelar
-            </button>
+                <button id="group-button">
+
+                    <span id="selected-group">
+                        Todos
+                    </span>
+
+                    <span>
+                        ⌄
+                    </span>
+
+                </button>
 
 
-            <button
-                id="create-group-button"
-                class="modal-create-button"
-            >
-                Crear
-            </button>
+                <div id="group-menu">
+
+                    <button
+                        class="group-option"
+                        data-group="all"
+                    >
+                        Todos
+                    </button>
+
+
+                    <button
+                        class="group-option"
+                        data-group="personal"
+                    >
+                        Personal
+                    </button>
+
+
+                    <div class="menu-separator"></div>
+
+
+                    <button
+                        id="open-create-group"
+                        class="group-option"
+                    >
+                        + Crear grupo
+                    </button>
+
+
+                    <div class="menu-separator"></div>
+
+
+                    <div class="join-title">
+                        UNIRSE A UN GRUPO
+                    </div>
+
+
+                    <div id="join-row">
+
+                        <input
+                            id="join-code"
+                            type="text"
+                            placeholder="Código"
+                        >
+
+                        <button
+                            id="paste-code"
+                            type="button"
+                        >
+                            Pegar
+                        </button>
+
+                    </div>
+
+
+                    <button
+                        id="join-group-button"
+                        type="button"
+                    >
+                        Unirse
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div id="map-controls">
+
+                <button
+                    id="layer-button"
+                    class="map-control"
+                >
+
+                    <div class="layers-icon">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </div>
+
+                </button>
+
+
+                <button
+                    id="center-location-button"
+                    class="map-control"
+                >
+
+                    <div class="location-arrow"></div>
+
+                </button>
+
+
+                <div id="layer-menu">
+
+                    <div
+                        class="layer-option"
+                        data-style="streets"
+                    >
+                        Mapa
+                    </div>
+
+                    <div
+                        class="layer-option"
+                        data-style="satellite"
+                    >
+                        Satélite
+                    </div>
+
+                    <div
+                        class="layer-option"
+                        data-style="hybrid"
+                    >
+                        Satélite + calles
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
+
+    <div
+        id="create-group-modal"
+        class="modal-background"
+    >
+
+        <div class="modal">
+
+            <h2>
+                Crear grupo
+            </h2>
 
 
+            <div class="form-group">
 
-<div id="toast"></div>
+                <label>
+                    Nombre del grupo
+                </label>
 
+                <input
+                    id="new-group-name"
+                    type="text"
+                    maxlength="50"
+                    placeholder="Ej. Familia"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Descripción
+                </label>
+
+                <textarea
+                    id="new-group-description"
+                    rows="3"
+                    maxlength="250"
+                    placeholder="Opcional"
+                ></textarea>
+
+            </div>
+
+
+            <div class="modal-buttons">
+
+                <button
+                    id="cancel-create-group"
+                    class="secondary-button"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    id="create-group-button"
+                    class="modal-create-button"
+                >
+                    Crear
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div id="toast"></div>
 
 
 <script>
 
-    /* =========================================================
+    /* =========================
        CONFIGURACIÓN
-    ========================================================= */
+    ========================== */
 
     const MAPTILER_API_KEY =
         "lJBAab5ODxqdFUoXLLm8";
 
-
     const SUPABASE_URL =
         "https://jpjnmdxkkqozqnxwnhmh.supabase.co";
-
 
     const SUPABASE_KEY =
         "sb_publishable_tqrKEj4LlKKR4FSns3AoUA_s6YPnOeo";
 
 
-
-    /* =========================================================
+    /* =========================
        SUPABASE
-    ========================================================= */
+    ========================== */
 
-    const supabaseClient =
-        window.supabase.createClient(
+    let supabaseClient = null;
+
+    try {
+
+        supabaseClient =
+            window.supabase.createClient(
+
+                SUPABASE_URL,
+
+                SUPABASE_KEY,
+
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true
+                    }
+                }
+
+            );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Error creando cliente Supabase:",
+            error
+        );
+
+    }
+
+
+    /* =========================
+       ELEMENTOS
+    ========================== */
+
+    const loadingScreen =
+        document.getElementById(
+            "loading-screen"
+        );
+
+    const authScreen =
+        document.getElementById(
+            "auth-screen"
+        );
+
+    const app =
+        document.getElementById(
+            "app"
+        );
+
+    const loginForm =
+        document.getElementById(
+            "login-form"
+        );
+
+    const registerForm =
+        document.getElementById(
+            "register-form"
+        );
+
+
+    /* =========================
+       MAPA
+    ========================== */
+
+    let map = null;
+
+    let userMarker = null;
+
+    let currentLatitude = null;
+
+    let currentLongitude = null;
+
+    let firstLocationReceived = false;
+
+    let locationInterval = null;
+
+
+    function initializeMap() {
+
+        if (map !== null) {
+            return;
+        }
+
+        maptilersdk.config.apiKey =
+            MAPTILER_API_KEY;
+
+        map =
+            new maptilersdk.Map({
+
+                container: "map",
+
+                style:
+                    maptilersdk
+                        .MapStyle
+                        .STREETS,
+
+                center: [
+                    -3.7038,
+                    40.4168
+                ],
+
+                zoom: 15,
+
+                navigationControl: false,
+
+                geolocateControl: false
+
+            });
+
+        getCurrentLocation();
+
+        locationInterval =
+            setInterval(
+                getCurrentLocation,
+                30000
+            );
+
+    }
+
+
+    function getCurrentLocation() {
+
+        if (
+            !("geolocation" in navigator)
+        ) {
+
+            return;
+
+        }
+
+        navigator.geolocation.getCurrentPosition(
+
+            updateUserLocation,
+
+            locationError,
+
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 15000
+            }
+
+        );
+
+    }
+
+
+    function updateUserLocation(position) {
+
+        currentLatitude =
+            position.coords.latitude;
+
+        currentLongitude =
+            position.coords.longitude;
+
+        if (userMarker === null) {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+            element.className =
+                "user-location";
+
+            userMarker =
+                new maptilersdk.Marker({
+                    element: element
+                })
+
+                .setLngLat([
+                    currentLongitude,
+                    currentLatitude
+                ])
+
+                .addTo(map);
+
+        }
+
+        else {
+
+            userMarker.setLngLat([
+                currentLongitude,
+                currentLatitude
+            ]);
+
+        }
+
+        if (
+            !firstLocationReceived
+        ) {
+
+            map.flyTo({
+
+                center: [
+                    currentLongitude,
+                    currentLatitude
+                ],
+
+                zoom: 18,
+
+                essential: true
+
+            });
+
+            firstLocationReceived = true;
+
+        }
+
+    }
+
+
+    function locationError(error) {
+
+        console.error(
+            "Error ubicación:",
+            error
+        );
+
+    }
+
+
+    document
+        .getElementById(
+            "center-location-button"
+        )
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+                if (
+                    currentLatitude === null ||
+                    currentLongitude === null
+                ) {
+
+                    getCurrentLocation();
+
+                    showToast(
+                        "Obteniendo ubicación..."
+                    );
+
+                    return;
+                }
+
+                map.flyTo({
+
+                    center: [
+                        currentLongitude,
+                        currentLatitude
+                    ],
+
+                    zoom: 18,
+
+                    essential: true
+
+                });
+
+            }
+
+        );
+
+
+    /* =========================
+       CAPAS
+    ========================== */
+
+    const layerButton =
+        document.getElementById(
+            "layer-button"
+        );
+
+    const layerMenu =
+        document.getElementById(
+            "layer-menu"
+        );
+
+
+    layerButton.addEventListener(
+
+        "click",
+
+        function(event) {
+
+            event.stopPropagation();
+
+            layerMenu.style.display =
+                layerMenu.style.display ===
+                "block"
+
+                ? "none"
+
+                : "block";
+
+        }
+
+    );
+
+
+    document
+        .querySelectorAll(
+            ".layer-option"
+        )
+        .forEach(
+
+            function(option) {
+
+                option.addEventListener(
+
+                    "click",
+
+                    function() {
+
+                        const style =
+                            this.dataset.style;
+
+                        if (
+                            style === "streets"
+                        ) {
+
+                            map.setStyle(
+                                maptilersdk
+                                    .MapStyle
+                                    .STREETS
+                            );
+
+                        }
+
+                        if (
+                            style === "satellite"
+                        ) {
+
+                            map.setStyle(
+                                maptilersdk
+                                    .MapStyle
+                                    .SATELLITE
+                            );
+
+                        }
+
+                        if (
+                            style === "hybrid"
+                        ) {
+
+                            map.setStyle(
+                                maptilersdk
+                                    .MapStyle
+                                    .HYBRID
+                            );
+
+                        }
+
+                        layerMenu.style.display =
+                            "none";
+
+                    }
+
+                );
+
+            }
+
+        );
+
+
+    /* =========================
+       CAMBIAR LOGIN / REGISTRO
+    ========================== */
+
+    document
+        .getElementById(
+            "show-register"
+        )
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+                loginForm.style.display =
+                    "none";
+
+                registerForm.style.display =
+                    "block";
+
+            }
+
+        );
+
+
+    document
+        .getElementById(
+            "show-login"
+        )
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+                registerForm.style.display =
+                    "none";
+
+                loginForm.style.display =
+                    "block";
+
+            }
+
+        );
+
+
+    /* =========================
+       REGISTRO
+    ========================== */
+
+    registerForm.addEventListener(
+
+        "submit",
+
+        async function(event) {
+
+            event.preventDefault();
+
+            clearAuthMessages();
+
+            if (!supabaseClient) {
+
+                showAuthMessage(
+                    "register-message",
+                    "No se ha podido iniciar Supabase.",
+                    "error"
+                );
+
+                return;
+            }
+
+            const firstName =
+                document
+                    .getElementById(
+                        "register-first-name"
+                    )
+                    .value
+                    .trim();
+
+            const lastName =
+                document
+                    .getElementById(
+                        "register-last-name"
+                    )
+                    .value
+                    .trim();
+
+            const email =
+                document
+                    .getElementById(
+                        "register-email"
+                    )
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById(
+                        "register-password"
+                    )
+                    .value;
+
+            const repeatPassword =
+                document
+                    .getElementById(
+                        "register-password-repeat"
+                    )
+                    .value;
+
+
+            if (
+                password !==
+                repeatPassword
+            ) {
+
+                showAuthMessage(
+                    "register-message",
+                    "Las contraseñas no coinciden.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            if (
+                password.length < 8
+            ) {
+
+                showAuthMessage(
+                    "register-message",
+                    "La contraseña debe tener al menos 8 caracteres.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            try {
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient
+                        .auth
+                        .signUp({
+
+                            email: email,
+
+                            password: password,
+
+                            options: {
+
+                                data: {
+
+                                    first_name:
+                                        firstName,
+
+                                    last_name:
+                                        lastName
+
+                                }
+
+                            }
+
+                        });
+
+
+                if (error) {
+
+                    showAuthMessage(
+                        "register-message",
+                        translateAuthError(
+                            error.message
+                        ),
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                if (data.session) {
+
+                    await showApplication(
+                        data.user
+                    );
+
+                }
+
+                else {
+
+                    showAuthMessage(
+                        "register-message",
+                        "Cuenta creada. Revisa el correo electrónico para continuar.",
+                        "success"
+                    );
+
+                }
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error registro:",
+                    error
+                );
+
+                showAuthMessage(
+                    "register-message",
+                    "No se ha podido crear la cuenta.",
+                    "error"
+                );
+
+            }
+
+        }
+
+    );
+
+
+    /* =========================
+       LOGIN
+    ========================== */
+
+    loginForm.addEventListener(
+
+        "submit",
+
+        async function(event) {
+
+            event.preventDefault();
+
+            clearAuthMessages();
+
+            if (!supabaseClient) {
+
+                showAuthMessage(
+                    "login-message",
+                    "No se ha podido iniciar Supabase.",
+                    "error"
+                );
+
+                return;
+            }
+
+            const email =
+                document
+                    .getElementById(
+                        "login-email"
+                    )
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById(
+                        "login-password"
+                    )
+                    .value;
+
+
+            try {
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient
+                        .auth
+                        .signInWithPassword({
+
+                            email: email,
+
+                            password: password
+
+                        });
+
+
+                if (error) {
+
+                    showAuthMessage(
+                        "login-message",
+                        "Correo o contraseña incorrectos.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                await showApplication(
+                    data.user
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Error login:",
+                    error
+                );
+
+                showAuthMessage(
+                    "login-message",
+                    "No se ha podido conectar con Supabase.",
+                    "error"
+                );
+
+            }
+
+        }
+
+    );
+
+
+    /* =========================
+       COMPROBAR SESIÓN INICIAL
+       CORREGIDO
+    ========================== */
+
+    async function checkInitialSession() {
+
+        try {
+
+            if (!supabaseClient) {
+
+                throw new Error(
+                    "Cliente Supabase no inicializado"
+                );
+
+            }
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .auth
+                    .getSession();
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            loadingScreen.style.display =
+                "none";
+
+
+            if (data.session) {
+
+                await showApplication(
+                    data.session.user
+                );
+
+            }
+
+            else {
+
+                showAuthentication();
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Error iniciando Supabase:",
+                error
+            );
+
+
+            loadingScreen.style.display =
+                "none";
+
+
+            authScreen.style.display =
+                "flex";
+
+
+            showAuthMessage(
+                "login-message",
+                "No se ha podido conectar con Supabase. Revisa la URL y la Publishable Key.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       CAMBIOS DE SESIÓN
+    ========================== */
+
+    if (supabaseClient) {
+
+        supabaseClient
+            .auth
+            .onAuthStateChange(
+
+                function(
+                    event,
+                    session
+                ) {
+
+                    if (
+                        event ===
+                        "SIGNED_OUT"
+                    ) {
+
+                        showAuthentication();
+
+                    }
+
+                }
+
+            );
+
+    }
+
+
+    /* =========================
+       MOSTRAR APP
+    ========================== */
+
+    async function showApplication(user) {
+
+        loadingScreen.style.display =
+            "none";
+
+        authScreen.style.display =
+            "none";
+
+        app.style.display =
+            "block";
+
+
+        await loadUserProfile(
+            user
+        );
+
+
+        initializeMap();
+
+
+        setTimeout(
+
+            function() {
+
+                if (map) {
+                    map.resize();
+                }
+
+            },
+
+            100
+
+        );
+
+    }
+
+
+    function showAuthentication() {
+
+        loadingScreen.style.display =
+            "none";
+
+        app.style.display =
+            "none";
+
+        authScreen.style.display =
+            "flex";
+
+        loginForm.style.display =
+            "block";
+
+        registerForm.style.display =
+            "none";
+
+        clearAuthMessages();
+
+    }
+
+
+    /* =========================
+       PERFIL
+    ========================== */
+
+    async function loadUserProfile(user) {
+
+        document
+            .getElementById(
+                "user-email"
+            )
+            .textContent =
+            user.email || "";
+
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+
+                    .from("profiles")
+
+                    .select(
+                        "first_name, last_name"
+                    )
+
+                    .eq(
+                        "id",
+                        user.id
+                    )
+
+                    .single();
+
+
+            if (
+                !error &&
+                data
+            ) {
+
+                document
+                    .getElementById(
+                        "user-name"
+                    )
+                    .textContent =
+                    (
+                        data.first_name +
+                        " " +
+                        data.last_name
+                    ).trim();
+
+            }
+
+            else {
+
+                document
+                    .getElementById(
+                        "user-name"
+                    )
+                    .textContent =
+                    "Usuario";
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Error cargando perfil:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       MENÚ USUARIO
+    ========================== */
+
+    const userMenu =
+        document.getElementById(
+            "user-menu"
+        );
+
+
+    document
+        .getElementById(
+            "user-button"
+        )
+        .addEventListener(
+
+            "click",
+
+            function(event) {
+
+                event.stopPropagation();
+
+                userMenu.style.display =
+                    userMenu.style.display ===
+                    "block"
+
+                    ? "none"
+
+                    : "block";
+
+            }
+
+        );
+
+
+    /* =========================
+       LOGOUT
+    ========================== */
+
+    document
+        .getElementById(
+            "logout-button"
+        )
+        .addEventListener(
+
+            "click",
+
+            async function() {
+
+                if (!supabaseClient) {
+                    return;
+                }
+
+                await supabaseClient
+                    .auth
+                    .signOut();
+
+                userMenu.style.display =
+                    "none";
+
+            }
+
+        );
+
+
+    /* =========================
+       GRUPOS
+    ========================== */
+
+    const groupButton =
+        document.getElementById(
+            "group-button"
+        );
+
+    const groupMenu =
+        document.getElementById(
+            "group-menu"
+        );
+
+
+    groupButton.addEventListener(
+
+        "click",
+
+        function(event) {
+
+            event.stopPropagation();
+
+            groupMenu.style.display =
+                groupMenu.style.display ===
+                "block"
+
+                ? "none"
+
+                : "block";
+
+        }
+
+    );
+
+
+    document
+        .querySelectorAll(
+            ".group-option[data-group]"
+        )
+        .forEach(
+
+            function(option) {
+
+                option.addEventListener(
+
+                    "click",
+
+                    function() {
+
+                        const group =
+                            this.dataset.group;
+
+                        document
+                            .getElementById(
+                                "selected-group"
+                            )
+                            .textContent =
+                            group === "all"
+                                ? "Todos"
+                                : "Personal";
+
+                        groupMenu.style.display =
+                            "none";
+
+                    }
+
+                );
+
+            }
+
+        );
+
+
+    /* =========================
+       CREAR GRUPO
+    ========================== */
+
+    const createGroupModal =
+        document.getElementById(
+            "create-group-modal"
+        );
+
+
+    document
+        .getElementById(
+            "open-create-group"
+        )
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+                groupMenu.style.display =
+                    "none";
+
+                createGroupModal.style.display =
+                    "flex";
+
+            }
+
+        );
+
+
+    document
+        .getElementById(
+            "cancel-create-group"
+        )
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+                createGroupModal.style.display =
+                    "none";
+
+            }
+
+        );
+
+
+    document
+        .getElementById(
+            "create-group-button"
+        )
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+                const name =
+                    document
+                        .getElementById(
+                            "new-group-name"
+                        )
+                        .value
+                        .trim();
+
+
+                if (!name) {
+
+                    showToast(
+                        "Introduce un nombre para el grupo."
+                    );
+
+                    return;
+                }
+
+
+                showToast(
+                    "Interfaz preparada. Falta conectar la tabla de grupos."
+                );
+
+            }
+
+        );
+
+
+    /* =========================
+       PEGAR CÓDIGO
+    ========================== */
+
+    document
+        .getElementById(
+            "paste-code"
+        )
+        .addEventListener(
+
+            "click",
+
+            async function() {
+
+                try {
+
+                    const text =
+                        await navigator
+                            .clipboard
+                            .readText();
+
+                    document
+                        .getElementById(
+                            "join-code"
+                        )
+                        .value =
+                        text
+                            .trim()
+                            .toUpperCase();
+
+                }
+
+                catch (error) {
+
+                    showToast(
+                        "El navegador no ha permitido acceder al portapapeles."
+                    );
+
+                }
+
+            }
+
+        );
+
+
+    /* =========================
+       UNIRSE A GRUPO
+    ========================== */
+
+    document
+        .getElementById(
+            "join-group-button"
+        )
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+                const code =
+                    document
+                        .getElementById(
+                            "join-code"
+                        )
+                        .value
+                        .trim()
+                        .toUpperCase();
+
+
+                if (!code) {
+
+                    showToast(
+                        "Introduce el código del grupo."
+                    );
+
+                    return;
+                }
+
+
+                showToast(
+                    "Interfaz preparada. Falta conectar la tabla de grupos."
+                );
+
+            }
+
+        );
+
+
+    /* =========================
+       CERRAR MENÚS
+    ========================== */
+
+    document.addEventListener(
+
+        "click",
+
+        function() {
+
+            userMenu.style.display =
+                "none";
+
+            groupMenu.style.display =
+                "none";
+
+            layerMenu.style.display =
+                "none";
+
+        }
+
+    );
+
+
+    userMenu.addEventListener(
+
+        "click",
+
+        function(event) {
+
+            event.stopPropagation();
+
+        }
+
+    );
+
+
+    groupMenu.addEventListener(
+
+        "click",
+
+        function(event) {
+
+            event.stopPropagation();
+
+        }
+
+    );
+
+
+    createGroupModal.addEventListener(
+
+        "click",
+
+        function(event) {
+
+            if (
+                event.target ===
+                createGroupModal
+            ) {
+
+                createGroupModal.style.display =
+                    "none";
+
+            }
+
+        }
+
+    );
+
+
+    /* =========================
+       MENSAJES
+    ========================== */
+
+    function showAuthMessage(
+        elementId,
+        message,
+        type
+    ) {
+
+        const element =
+            document.getElementById(
+                elementId
+            );
+
+        element.textContent =
+            message;
+
+        element.className =
+            "auth-message " +
+            type;
+
+    }
+
+
+    function clearAuthMessages() {
+
+        [
+            "login-message",
+            "register-message"
+        ]
+        .forEach(
+
+            function(id) {
+
+                const element =
+                    document.getElementById(
+                        id
+                    );
+
+                element.textContent =
+                    "";
+
+                element.className =
+                    "auth-message";
+
+            }
+
+        );
+
+    }
+
+
+    function translateAuthError(message) {
+
+        const lower =
+            message.toLowerCase();
+
+
+        if (
+            lower.includes(
+                "already registered"
+            )
+        ) {
+
+            return "Ya existe una cuenta con ese correo.";
+
+        }
+
+
+        if (
+            lower.includes(
+                "password"
+            )
+        ) {
+
+            return "La contraseña no cumple los requisitos.";
+
+        }
+
+
+        if (
+            lower.includes(
+                "email"
+            )
+        ) {
+
+            return "Comprueba que el correo electrónico sea correcto.";
+
+        }
+
+
+        return message;
+
+    }
+
+
+    let toastTimeout = null;
+
+
+    function showToast(message) {
+
+        const toast =
+            document.getElementById(
+                "toast"
+            );
+
+        toast.textContent =
+            message;
+
+        toast.style.display =
+            "block";
+
+        clearTimeout(
+            toastTimeout
+        );
+
+        toastTimeout =
+            setTimeout(
+
+                function() {
+
+                    toast.style.display =
+                        "none";
+
+                },
+
+                3000
+
+            );
+
+    }
+
+
+    /* =========================
+       INICIO
+    ========================== */
+
+    checkInitialSession();
+
+</script>
+
+</body>
+
+</html>
