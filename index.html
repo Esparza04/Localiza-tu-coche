@@ -5,22 +5,69 @@
     <meta charset="UTF-8">
 
     <meta
+        http-equiv="Cache-Control"
+        content="no-cache, no-store, must-revalidate"
+    >
+
+    <meta
+        http-equiv="Pragma"
+        content="no-cache"
+    >
+
+    <meta
+        http-equiv="Expires"
+        content="0"
+    >
+
+    <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
     <title>Localiza tu coche</title>
 
+    <script>
+        (function() {
+            const version = "2026-08-14-02";
+
+            window.APP_PARKING_VERSION = version;
+            window.APP_PARKING_RELOADING = false;
+
+            if (
+                location.protocol !== "http:" &&
+                location.protocol !== "https:"
+            ) {
+                return;
+            }
+
+            const url = new URL(location.href);
+
+            const hasAuthCallback =
+                url.searchParams.has("code") ||
+                location.hash.includes("access_token") ||
+                location.hash.includes("refresh_token");
+
+            if (
+                !hasAuthCallback &&
+                url.searchParams.get("app_version") !== version
+            ) {
+                url.searchParams.set("app_version", version);
+                window.APP_PARKING_RELOADING = true;
+                window.location.replace(url.toString());
+            }
+        })();
+    </script>
+
     <!-- MAPTILER -->
     <link
-        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-02"
         rel="stylesheet"
     >
 
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-02"></script>
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-02"></script>
 
 
     <style>
@@ -197,6 +244,11 @@
             background: white;
         }
 
+        .form-group textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
         .form-group input:focus,
         .form-group textarea:focus {
             border-color: #2388e8;
@@ -222,7 +274,9 @@
 
         .primary-button:disabled,
         .modal-create-button:disabled,
-        #join-group-button:disabled {
+        #join-group-button:disabled,
+        .bottom-action-button:disabled,
+        .vehicle-unpark-button:disabled {
             opacity: 0.6;
             cursor: default;
         }
@@ -358,6 +412,7 @@
                 rgba(0, 0, 0, 0.25);
 
             font-size: 20px;
+            font-weight: bold;
         }
 
         #user-menu {
@@ -548,6 +603,27 @@
             font-weight: bold;
         }
 
+        .dynamic-group-option {
+            display: block;
+            cursor: pointer;
+        }
+
+        .group-name-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 8px;
+        }
+
+        .group-name-text {
+            min-width: 0;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
         .group-role {
             margin-left: 6px;
 
@@ -555,6 +631,49 @@
 
             font-size: 11px;
             font-weight: normal;
+        }
+
+        .group-code-row {
+            margin-top: 6px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 8px;
+
+            color: #666666;
+
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .group-code-text {
+            min-width: 0;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+
+            font-family: monospace;
+        }
+
+        .copy-group-code {
+            flex-shrink: 0;
+
+            padding:
+                6px
+                8px;
+
+            border: none;
+            border-radius: 7px;
+
+            background: #eef5ff;
+
+            color: #1769aa;
+
+            font-size: 12px;
+            font-weight: bold;
         }
 
         .menu-separator {
@@ -792,6 +911,474 @@
 
 
         /* =====================================================
+           VEHICULOS
+        ===================================================== */
+
+        #bottom-actions {
+            position: absolute;
+
+            left: 50%;
+            bottom: 24px;
+
+            z-index: 24;
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 8px;
+
+            border-radius: 16px;
+
+            background:
+                rgba(255,255,255,0.96);
+
+            box-shadow:
+                0 4px 16px
+                rgba(0,0,0,0.25);
+
+            transform:
+                translateX(-50%);
+        }
+
+        .bottom-action-button {
+            min-width: 118px;
+            height: 44px;
+
+            padding:
+                0
+                16px;
+
+            border: none;
+            border-radius: 11px;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        #open-create-vehicle {
+            background: #2388e8;
+        }
+
+        #open-park-vehicle {
+            background: #1f7a45;
+        }
+
+        .vehicle-marker {
+            position: relative;
+
+            width: 30px;
+            height: 30px;
+
+            border:
+                3px solid
+                white;
+
+            background:
+                var(--vehicle-color, #2388e8);
+
+            box-shadow:
+                0 2px 9px
+                rgba(0,0,0,0.34);
+
+            cursor: pointer;
+        }
+
+        .vehicle-marker.dot {
+            border-radius: 50%;
+        }
+
+        .vehicle-marker.square {
+            border-radius: 7px;
+        }
+
+        .vehicle-marker.car {
+            width: 34px;
+            height: 22px;
+
+            border-radius:
+                9px
+                9px
+                6px
+                6px;
+        }
+
+        .vehicle-marker.car::before {
+            content: "";
+
+            position: absolute;
+
+            top: -7px;
+            left: 7px;
+
+            width: 14px;
+            height: 9px;
+
+            border:
+                3px solid
+                white;
+
+            border-bottom: none;
+
+            border-radius:
+                8px
+                8px
+                0
+                0;
+
+            background:
+                var(--vehicle-color, #2388e8);
+        }
+
+        .vehicle-marker.car::after {
+            content: "";
+
+            position: absolute;
+
+            left: 5px;
+            bottom: -6px;
+
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: #222222;
+
+            box-shadow:
+                17px
+                0
+                0
+                #222222;
+        }
+
+        .vehicle-popup {
+            min-width: 210px;
+
+            color: #222222;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .vehicle-popup-title {
+            margin-bottom: 5px;
+
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .vehicle-popup-line {
+            margin-top: 4px;
+
+            color: #555555;
+
+            font-size: 13px;
+        }
+
+        .vehicle-popup-time {
+            margin-top: 8px;
+
+            padding-top: 8px;
+
+            border-top:
+                1px solid
+                #eeeeee;
+        }
+
+        .vehicle-unpark-button {
+            width: 100%;
+
+            margin-top: 12px;
+
+            padding: 10px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: #c62828;
+
+            color: white;
+
+            font-weight: bold;
+        }
+
+        .modal-note {
+            margin:
+                -6px
+                0
+                14px;
+
+            color: #777777;
+
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .field-row {
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                88px;
+
+            gap: 10px;
+        }
+
+        .select-input {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border:
+                1px solid
+                #d8d8d8;
+
+            border-radius: 10px;
+
+            background: white;
+
+            font-size: 16px;
+        }
+
+        .color-input {
+            width: 100%;
+            height: 47px;
+
+            padding: 4px;
+
+            border:
+                1px solid
+                #d8d8d8;
+
+            border-radius: 10px;
+
+            background: white;
+        }
+
+        .marker-preview-row {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        #vehicle-marker-preview {
+            flex-shrink: 0;
+        }
+
+        .vehicle-group-list {
+            max-height: 128px;
+
+            overflow-y: auto;
+
+            padding: 4px;
+
+            border:
+                1px solid
+                #e1e1e1;
+
+            border-radius: 10px;
+
+            background: #fbfbfb;
+        }
+
+        .vehicle-group-choice {
+            display: flex;
+            align-items: center;
+
+            gap: 9px;
+
+            padding: 9px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+        }
+
+        .vehicle-group-choice:hover {
+            background: #f1f1f1;
+        }
+
+        .vehicle-empty-state {
+            padding: 16px;
+
+            color: #777777;
+
+            text-align: center;
+
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .park-vehicle-list {
+            max-height:
+                min(360px, calc(100vh - 260px));
+
+            overflow-y: auto;
+
+            display: grid;
+
+            gap: 8px;
+        }
+
+        .park-vehicle-option {
+            width: 100%;
+
+            padding: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 12px;
+
+            border:
+                1px solid
+                #e0e0e0;
+
+            border-radius: 10px;
+
+            background: white;
+
+            text-align: left;
+        }
+
+        .park-vehicle-option:hover {
+            border-color: #2388e8;
+
+            background: #f5faff;
+        }
+
+        .park-vehicle-name {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .park-vehicle-meta {
+            margin-top: 3px;
+
+            color: #777777;
+
+            font-size: 12px;
+        }
+
+        .parking-center-marker {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            z-index: 22;
+
+            display: none;
+
+            width: 34px;
+            height: 34px;
+
+            border:
+                3px solid
+                white;
+
+            border-radius: 50%;
+
+            background: #1f7a45;
+
+            box-shadow:
+                0 2px 12px
+                rgba(0,0,0,0.35);
+
+            transform:
+                translate(-50%, -50%);
+
+            pointer-events: none;
+        }
+
+        .parking-center-marker::after {
+            content: "";
+
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: white;
+
+            transform:
+                translateX(-50%)
+                translateY(-50%);
+        }
+
+        .parking-picker {
+            position: absolute;
+
+            left: 50%;
+            bottom: 24px;
+
+            z-index: 26;
+
+            display: none;
+
+            width:
+                min(430px, calc(100vw - 28px));
+
+            padding: 14px;
+
+            border-radius: 16px;
+
+            background:
+                rgba(255,255,255,0.97);
+
+            box-shadow:
+                0 5px 18px
+                rgba(0,0,0,0.26);
+
+            transform:
+                translateX(-50%);
+        }
+
+        .parking-picker-title {
+            margin-bottom: 4px;
+
+            font-weight: bold;
+        }
+
+        .parking-picker-coords {
+            color: #666666;
+
+            font-size: 12px;
+        }
+
+        .parking-picker-buttons {
+            display: flex;
+
+            gap: 8px;
+
+            margin-top: 12px;
+        }
+
+        .parking-picker-buttons button {
+            flex: 1;
+        }
+
+        .parking-selection-active #bottom-actions {
+            display: none;
+        }
+
+        .parking-selection-active .parking-center-marker,
+        .parking-selection-active .parking-picker {
+            display: block;
+        }
+
+
+        /* =====================================================
            MODALES
         ===================================================== */
 
@@ -815,6 +1402,10 @@
         .modal {
             width: 100%;
             max-width: 420px;
+            max-height:
+                calc(100vh - 40px);
+
+            overflow-y: auto;
 
             padding: 22px;
 
@@ -910,12 +1501,16 @@
         }
 
         #created-group-code {
+            min-width: 0;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+
             font-family: monospace;
 
             font-size: 19px;
             font-weight: bold;
-
-            letter-spacing: 1px;
         }
 
         #copy-created-code {
@@ -942,7 +1537,7 @@
             position: fixed;
 
             left: 50%;
-            bottom: 25px;
+            bottom: 92px;
 
             z-index: 1000;
 
@@ -1001,6 +1596,28 @@
             .map-control {
                 width: 40px;
                 height: 40px;
+            }
+
+            #bottom-actions {
+                bottom: 14px;
+
+                width:
+                    calc(100vw - 24px);
+            }
+
+            .bottom-action-button {
+                flex: 1;
+
+                min-width: 0;
+            }
+
+            .parking-picker {
+                bottom: 14px;
+            }
+
+            .field-row {
+                grid-template-columns:
+                    1fr;
             }
 
         }
@@ -1107,6 +1724,7 @@
             </div>
 
         </form>
+
 
 
         <!-- REGISTRO -->
@@ -1249,28 +1867,28 @@
             <button
                 id="user-button"
                 class="square-button"
-                aria-label="Usuario"
+                type="button"
+                aria-label="Menú de usuario"
             >
-                ♙
+                P
             </button>
-
 
             <div id="user-menu">
 
                 <div id="user-info">
-
                     <div id="user-name">
                         Usuario
                     </div>
 
-                    <div id="user-email"></div>
-
+                    <div id="user-email">
+                        correo@ejemplo.com
+                    </div>
                 </div>
-
 
                 <button
                     id="logout-button"
                     class="menu-button danger"
+                    type="button"
                 >
                     Cerrar sesión
                 </button>
@@ -1285,62 +1903,55 @@
 
         <div id="group-area">
 
-            <button id="group-button">
-
+            <button
+                id="group-button"
+                type="button"
+            >
                 <span id="selected-group">
                     Todos
                 </span>
 
                 <span class="group-chevron"></span>
-
             </button>
 
 
             <div id="group-menu">
 
-
                 <button
-                    id="all-groups-option"
                     class="group-option active"
                     type="button"
+                    data-group-id="all"
+                    data-group-name="Todos"
                 >
                     Todos
                 </button>
 
-
                 <button
-                    id="personal-group-option"
                     class="group-option"
                     type="button"
+                    data-group-id="personal"
+                    data-group-name="Personal"
                 >
                     Personal
                 </button>
 
-
-                <!-- AQUÍ SE INSERTAN LOS GRUPOS REALES -->
-
                 <div id="dynamic-groups"></div>
 
-
                 <div class="menu-separator"></div>
-
 
                 <button
                     id="open-create-group"
-                    class="group-option"
+                    class="menu-button"
                     type="button"
                 >
-                    + Crear grupo
+                    Crear grupo
                 </button>
-
 
                 <div class="menu-separator"></div>
 
-
                 <div class="join-title">
-                    UNIRSE A UN GRUPO
+                    Unirse a un grupo
                 </div>
-
 
                 <div id="join-row">
 
@@ -1349,6 +1960,7 @@
                         type="text"
                         placeholder="Código"
                         autocomplete="off"
+                        maxlength="20"
                     >
 
                     <button
@@ -1360,7 +1972,6 @@
 
                 </div>
 
-
                 <button
                     id="join-group-button"
                     type="button"
@@ -1368,45 +1979,37 @@
                     Unirse
                 </button>
 
-
             </div>
 
         </div>
 
 
 
-        <!-- MAPA -->
+        <!-- CONTROLES MAPA -->
 
         <div id="map-controls">
-
 
             <button
                 id="layer-button"
                 class="map-control"
-                aria-label="Capas"
+                type="button"
+                aria-label="Cambiar capa"
             >
-
                 <div class="layers-icon">
-
                     <span></span>
                     <span></span>
                     <span></span>
-
                 </div>
-
             </button>
-
 
             <button
                 id="center-location-button"
                 class="map-control"
-                aria-label="Centrar ubicación"
+                type="button"
+                aria-label="Centrar en mi ubicación"
             >
-
                 <div class="location-arrow"></div>
-
             </button>
-
 
             <div id="layer-menu">
 
@@ -1433,6 +2036,69 @@
 
             </div>
 
+        </div>
+
+    </div>
+
+    <div id="bottom-actions">
+
+        <button
+            id="open-create-vehicle"
+            class="bottom-action-button"
+            type="button"
+        >
+            + Vehículo
+        </button>
+
+        <button
+            id="open-park-vehicle"
+            class="bottom-action-button"
+            type="button"
+        >
+            Aparcar
+        </button>
+
+    </div>
+
+    <div
+        id="parking-center-marker"
+        class="parking-center-marker"
+    ></div>
+
+    <div
+        id="parking-picker"
+        class="parking-picker"
+    >
+
+        <div
+            id="parking-picker-title"
+            class="parking-picker-title"
+        >
+            Aparcar vehículo
+        </div>
+
+        <div
+            id="parking-picker-coords"
+            class="parking-picker-coords"
+        ></div>
+
+        <div class="parking-picker-buttons">
+
+            <button
+                id="cancel-parking-selection"
+                class="secondary-button"
+                type="button"
+            >
+                Cancelar
+            </button>
+
+            <button
+                id="confirm-parking-location"
+                class="modal-create-button"
+                type="button"
+            >
+                Confirmar
+            </button>
 
         </div>
 
@@ -1457,7 +2123,6 @@
             Crear grupo
         </h2>
 
-
         <div class="form-group">
 
             <label>
@@ -1465,14 +2130,13 @@
             </label>
 
             <input
-                id="new-group-name"
+                id="create-group-name"
                 type="text"
                 maxlength="50"
-                placeholder="Ej. Familia"
+                autocomplete="off"
             >
 
         </div>
-
 
         <div class="form-group">
 
@@ -1481,14 +2145,11 @@
             </label>
 
             <textarea
-                id="new-group-description"
-                rows="3"
+                id="create-group-description"
                 maxlength="250"
-                placeholder="Opcional"
             ></textarea>
 
         </div>
-
 
         <div class="modal-buttons">
 
@@ -1500,9 +2161,8 @@
                 Cancelar
             </button>
 
-
             <button
-                id="create-group-button"
+                id="create-group-confirm"
                 class="modal-create-button"
                 type="button"
             >
@@ -1518,11 +2178,11 @@
 
 
 <!-- =========================================================
-     MODAL GRUPO CREADO
+     MODAL CÓDIGO CREADO
 ========================================================= -->
 
 <div
-    id="group-created-modal"
+    id="created-group-modal"
     class="modal-background"
 >
 
@@ -1537,14 +2197,9 @@
             class="created-group-name"
         ></div>
 
-
-        <div class="modal-text">
-
-            Comparte este código con las personas
-            que quieras añadir al grupo.
-
-        </div>
-
+        <p class="modal-text">
+            Comparte este código con las personas que quieras invitar al grupo.
+        </p>
 
         <div class="join-code-box">
 
@@ -1559,7 +2214,6 @@
 
         </div>
 
-
         <div class="modal-buttons">
 
             <button
@@ -1567,7 +2221,7 @@
                 class="modal-create-button"
                 type="button"
             >
-                Cerrar
+                Listo
             </button>
 
         </div>
@@ -1578,393 +2232,2907 @@
 
 
 
+<!-- =========================================================
+     MODAL CREAR VEHICULO
+========================================================= -->
+
+<div
+    id="create-vehicle-modal"
+    class="modal-background"
+>
+
+    <div class="modal">
+
+        <h2>
+            Crear vehículo
+        </h2>
+
+        <div class="form-group">
+
+            <label>
+                Nombre
+            </label>
+
+            <input
+                id="vehicle-name"
+                type="text"
+                maxlength="80"
+                autocomplete="off"
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Descripción
+            </label>
+
+            <textarea
+                id="vehicle-description"
+                maxlength="250"
+            ></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Matrícula
+            </label>
+
+            <input
+                id="vehicle-plate"
+                type="text"
+                maxlength="30"
+                autocomplete="off"
+            >
+
+        </div>
+
+        <div class="field-row">
+
+            <div class="form-group">
+
+                <label>
+                    Marcador
+                </label>
+
+                <select
+                    id="vehicle-marker-type"
+                    class="select-input"
+                >
+                    <option value="dot">
+                        Punto
+                    </option>
+
+                    <option value="square">
+                        Cuadrado
+                    </option>
+
+                    <option value="car">
+                        Coche
+                    </option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Color
+                </label>
+
+                <input
+                    id="vehicle-marker-color"
+                    class="color-input"
+                    type="color"
+                    value="#2388E8"
+                >
+
+            </div>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Vista previa
+            </label>
+
+            <div class="marker-preview-row">
+
+                <div
+                    id="vehicle-marker-preview"
+                    class="vehicle-marker dot"
+                    style="--vehicle-color: #2388E8;"
+                ></div>
+
+                <span class="modal-text">
+                    Así se verá en el mapa.
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Grupos
+            </label>
+
+            <p class="modal-note">
+                Puedes dejarlo sin grupos para que sea personal, o compartirlo con uno o varios grupos.
+            </p>
+
+            <div
+                id="vehicle-group-list"
+                class="vehicle-group-list"
+            ></div>
+
+        </div>
+
+        <div class="modal-buttons">
+
+            <button
+                id="cancel-create-vehicle"
+                class="secondary-button"
+                type="button"
+            >
+                Cancelar
+            </button>
+
+            <button
+                id="create-vehicle-confirm"
+                class="modal-create-button"
+                type="button"
+            >
+                Crear
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     MODAL APARCAR VEHICULO
+========================================================= -->
+
+<div
+    id="park-vehicle-modal"
+    class="modal-background"
+>
+
+    <div class="modal">
+
+        <h2>
+            Aparcar vehículo
+        </h2>
+
+        <p class="modal-note">
+            Elige un vehículo y después mueve el mapa hasta dejar el marcador justo encima del sitio.
+        </p>
+
+        <div
+            id="park-vehicle-list"
+            class="park-vehicle-list"
+        ></div>
+
+        <div class="modal-buttons">
+
+            <button
+                id="cancel-park-vehicle"
+                class="secondary-button"
+                type="button"
+            >
+                Cancelar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TOAST
+========================================================= -->
+
 <div id="toast"></div>
 
 
 
 <script>
 
-    /* =========================================================
-       CONFIGURACIÓN
+    (function() {
 
-       Sustituye SOLO estos tres valores.
-    ========================================================= */
-
-    const MAPTILER_API_KEY =
-        "lJBAab5ODxqdFUoXLLm8";
+        if (window.APP_PARKING_RELOADING) {
+            return;
+        }
 
 
-    const SUPABASE_URL =
-        "https://jpjnmdxkkqozqnxwnhmh.supabase.co";
+        // =====================================================
+        // CONFIGURACIÓN
+        // =====================================================
+
+        const APP_VERSION =
+            window.APP_PARKING_VERSION ||
+            "2026-08-14-02";
+
+        const APP_VERSION_STORAGE_KEY =
+            "app-parking-version";
+
+        const MAPTILER_API_KEY =
+            "lJBAab5ODxqdFUoXLLm8";
+
+        const SUPABASE_URL =
+            "https://jpjnmdxkkqozqnxwnhmh.supabase.co";
+
+        const SUPABASE_KEY =
+            "sb_publishable_tqrKEj4LlKKR4FSns3AoUA_s6YPnOeo";
 
 
-    const SUPABASE_KEY =
-        "sb_publishable_tqrKEj4LlKKR4FSns3AoUA_s6YPnOeo";
+        // =====================================================
+        // ESTADO
+        // =====================================================
+
+        let supabaseClient = null;
+
+        let currentUser = null;
+        let currentProfile = null;
+
+        let userGroups = [];
+        let selectedGroupId = "all";
+
+        let vehicles = [];
+        let vehicleMarkers = new Map();
+        let vehicleRefreshTimer = null;
+        let elapsedRefreshTimer = null;
+        let vehicleInfoPopup = null;
+        let openVehiclePopupId = null;
+
+        let parkingSelectionVehicleId = null;
+
+        let map = null;
+        let userMarker = null;
+
+        let currentLatitude = null;
+        let currentLongitude = null;
+
+        let firstLocationReceived = false;
+        let locationWatchId = null;
+
+        let toastTimer = null;
 
 
+        // =====================================================
+        // ELEMENTOS
+        // =====================================================
 
-    /* =========================================================
-       SUPABASE
-    ========================================================= */
+        const loadingScreen =
+            document.getElementById("loading-screen");
 
-    let supabaseClient = null;
+        const authScreen =
+            document.getElementById("auth-screen");
+
+        const app =
+            document.getElementById("app");
+
+        const loginForm =
+            document.getElementById("login-form");
+
+        const registerForm =
+            document.getElementById("register-form");
+
+        const loginMessage =
+            document.getElementById("login-message");
+
+        const registerMessage =
+            document.getElementById("register-message");
+
+        const showRegisterButton =
+            document.getElementById("show-register");
+
+        const showLoginButton =
+            document.getElementById("show-login");
+
+        const userButton =
+            document.getElementById("user-button");
+
+        const userMenu =
+            document.getElementById("user-menu");
+
+        const userName =
+            document.getElementById("user-name");
+
+        const userEmail =
+            document.getElementById("user-email");
+
+        const logoutButton =
+            document.getElementById("logout-button");
+
+        const groupButton =
+            document.getElementById("group-button");
+
+        const groupMenu =
+            document.getElementById("group-menu");
+
+        const selectedGroup =
+            document.getElementById("selected-group");
+
+        const dynamicGroups =
+            document.getElementById("dynamic-groups");
+
+        const openCreateGroupButton =
+            document.getElementById("open-create-group");
+
+        const createGroupModal =
+            document.getElementById("create-group-modal");
+
+        const createGroupNameInput =
+            document.getElementById("create-group-name");
+
+        const createGroupDescriptionInput =
+            document.getElementById("create-group-description");
+
+        const cancelCreateGroupButton =
+            document.getElementById("cancel-create-group");
+
+        const createGroupConfirmButton =
+            document.getElementById("create-group-confirm");
+
+        const createdGroupModal =
+            document.getElementById("created-group-modal");
+
+        const createdGroupName =
+            document.getElementById("created-group-name");
+
+        const createdGroupCode =
+            document.getElementById("created-group-code");
+
+        const copyCreatedCodeButton =
+            document.getElementById("copy-created-code");
+
+        const closeCreatedGroupButton =
+            document.getElementById("close-created-group");
+
+        const joinCodeInput =
+            document.getElementById("join-code");
+
+        const pasteCodeButton =
+            document.getElementById("paste-code");
+
+        const joinGroupButton =
+            document.getElementById("join-group-button");
+
+        const layerButton =
+            document.getElementById("layer-button");
+
+        const layerMenu =
+            document.getElementById("layer-menu");
+
+        const centerLocationButton =
+            document.getElementById("center-location-button");
+
+        const openCreateVehicleButton =
+            document.getElementById("open-create-vehicle");
+
+        const openParkVehicleButton =
+            document.getElementById("open-park-vehicle");
+
+        const createVehicleModal =
+            document.getElementById("create-vehicle-modal");
+
+        const vehicleNameInput =
+            document.getElementById("vehicle-name");
+
+        const vehicleDescriptionInput =
+            document.getElementById("vehicle-description");
+
+        const vehiclePlateInput =
+            document.getElementById("vehicle-plate");
+
+        const vehicleMarkerTypeSelect =
+            document.getElementById("vehicle-marker-type");
+
+        const vehicleMarkerColorInput =
+            document.getElementById("vehicle-marker-color");
+
+        const vehicleMarkerPreview =
+            document.getElementById("vehicle-marker-preview");
+
+        const vehicleGroupList =
+            document.getElementById("vehicle-group-list");
+
+        const cancelCreateVehicleButton =
+            document.getElementById("cancel-create-vehicle");
+
+        const createVehicleConfirmButton =
+            document.getElementById("create-vehicle-confirm");
+
+        const parkVehicleModal =
+            document.getElementById("park-vehicle-modal");
+
+        const parkVehicleList =
+            document.getElementById("park-vehicle-list");
+
+        const cancelParkVehicleButton =
+            document.getElementById("cancel-park-vehicle");
+
+        const parkingPickerTitle =
+            document.getElementById("parking-picker-title");
+
+        const parkingPickerCoords =
+            document.getElementById("parking-picker-coords");
+
+        const cancelParkingSelectionButton =
+            document.getElementById("cancel-parking-selection");
+
+        const confirmParkingLocationButton =
+            document.getElementById("confirm-parking-location");
+
+        const toast =
+            document.getElementById("toast");
 
 
-    try {
+        // =====================================================
+        // ARRANQUE
+        // =====================================================
 
-        supabaseClient =
-            window.supabase.createClient(
+        document.addEventListener(
+            "DOMContentLoaded",
+            initializeApplication
+        );
 
-                SUPABASE_URL,
 
-                SUPABASE_KEY,
+        async function initializeApplication() {
 
-                {
+            await maintainApplicationCache();
 
-                    auth: {
+            attachInterfaceEvents();
 
-                        persistSession: true,
+            if (!initializeSupabase()) {
+                showAuthScreen(
+                    "No se pudo iniciar Supabase. Actualiza la página y revisa la configuración."
+                );
 
-                        autoRefreshToken: true,
+                return;
+            }
 
-                        detectSessionInUrl: true
+            const sessionResult =
+                await supabaseClient.auth.getSession();
+
+            if (sessionResult.error) {
+                console.error(
+                    "Error recuperando sesión:",
+                    sessionResult.error
+                );
+
+                showAuthScreen(
+                    "No se pudo recuperar la sesión guardada."
+                );
+
+                return;
+            }
+
+            const session =
+                sessionResult.data.session;
+
+            supabaseClient.auth.onAuthStateChange(
+                function(event, nextSession) {
+
+                    if (
+                        event === "SIGNED_IN" ||
+                        event === "TOKEN_REFRESHED" ||
+                        event === "USER_UPDATED"
+                    ) {
+
+                        if (nextSession && nextSession.user) {
+                            startAuthenticatedApplication(
+                                nextSession.user
+                            );
+                        }
 
                     }
 
+                    if (event === "SIGNED_OUT") {
+                        currentUser = null;
+                        currentProfile = null;
+                        userGroups = [];
+                        selectedGroupId = "all";
+                        vehicles = [];
+
+                        resetVehicleState();
+
+                        showAuthScreen();
+                    }
+
                 }
-
             );
 
-    }
-
-    catch (error) {
-
-        console.error(
-            "Error creando cliente Supabase:",
-            error
-        );
-
-    }
-
-
-
-    /* =========================================================
-       ELEMENTOS
-    ========================================================= */
-
-    const loadingScreen =
-        document.getElementById(
-            "loading-screen"
-        );
-
-
-    const authScreen =
-        document.getElementById(
-            "auth-screen"
-        );
-
-
-    const app =
-        document.getElementById(
-            "app"
-        );
-
-
-    const loginForm =
-        document.getElementById(
-            "login-form"
-        );
-
-
-    const registerForm =
-        document.getElementById(
-            "register-form"
-        );
-
-
-    const groupButton =
-        document.getElementById(
-            "group-button"
-        );
-
-
-    const groupMenu =
-        document.getElementById(
-            "group-menu"
-        );
-
-
-    const dynamicGroups =
-        document.getElementById(
-            "dynamic-groups"
-        );
-
-
-    const selectedGroupLabel =
-        document.getElementById(
-            "selected-group"
-        );
-
-
-
-    /* =========================================================
-       ESTADO DE GRUPOS
-    ========================================================= */
-
-    let userGroups = [];
-
-
-    let selectedGroup = {
-
-        type: "all",
-
-        id: null,
-
-        name: "Todos"
-
-    };
-
-
-
-    /* =========================================================
-       MAPA
-    ========================================================= */
-
-    let map = null;
-
-    let userMarker = null;
-
-    let currentLatitude = null;
-
-    let currentLongitude = null;
-
-    let firstLocationReceived = false;
-
-    let locationInterval = null;
-
-
-
-    function initializeMap() {
-
-        if (map !== null) {
-
-            return;
-
-        }
-
-
-        maptilersdk.config.apiKey =
-            MAPTILER_API_KEY;
-
-
-        map =
-            new maptilersdk.Map({
-
-                container: "map",
-
-                style:
-                    maptilersdk
-                        .MapStyle
-                        .STREETS,
-
-                center: [
-                    -3.7038,
-                    40.4168
-                ],
-
-                zoom: 15,
-
-                navigationControl: false,
-
-                geolocateControl: false
-
-            });
-
-
-        getCurrentLocation();
-
-
-        locationInterval =
-            setInterval(
-
-                getCurrentLocation,
-
-                30000
-
-            );
-
-    }
-
-
-
-    /* =========================================================
-       UBICACIÓN
-    ========================================================= */
-
-    function getCurrentLocation() {
-
-        if (
-            !("geolocation" in navigator)
-        ) {
-
-            return;
-
-        }
-
-
-        navigator.geolocation.getCurrentPosition(
-
-            updateUserLocation,
-
-            locationError,
-
-            {
-
-                enableHighAccuracy: true,
-
-                maximumAge: 5000,
-
-                timeout: 15000
-
+            if (session && session.user) {
+                await startAuthenticatedApplication(
+                    session.user
+                );
             }
 
-        );
+            else {
+                showAuthScreen();
+            }
 
-    }
-
-
-
-    function updateUserLocation(position) {
-
-        currentLatitude =
-            position.coords.latitude;
+        }
 
 
-        currentLongitude =
-            position.coords.longitude;
+        async function maintainApplicationCache() {
+
+            try {
+                const storedVersion =
+                    localStorage.getItem(
+                        APP_VERSION_STORAGE_KEY
+                    );
+
+                if (storedVersion === APP_VERSION) {
+                    return;
+                }
+
+                if ("caches" in window) {
+                    const cacheNames =
+                        await window.caches.keys();
+
+                    await Promise.all(
+                        cacheNames
+                            .filter(shouldDeleteCache)
+                            .map(function(cacheName) {
+                                return window.caches.delete(
+                                    cacheName
+                                );
+                            })
+                    );
+                }
+
+                if ("serviceWorker" in navigator) {
+                    const registrations =
+                        await navigator.serviceWorker.getRegistrations();
+
+                    await Promise.all(
+                        registrations
+                            .filter(shouldUnregisterServiceWorker)
+                            .map(function(registration) {
+                                return registration.unregister();
+                            })
+                    );
+                }
+
+                localStorage.setItem(
+                    APP_VERSION_STORAGE_KEY,
+                    APP_VERSION
+                );
+            }
+
+            catch (error) {
+                console.warn(
+                    "No se pudo limpiar la caché de la app:",
+                    error
+                );
+            }
+
+        }
 
 
-        if (
-            userMarker === null
-        ) {
+        function shouldDeleteCache(cacheName) {
 
-            const element =
-                document.createElement(
-                    "div"
+            const normalizedName =
+                String(cacheName).toLowerCase();
+
+            return (
+                normalizedName.includes("parking") ||
+                normalizedName.includes("localiza") ||
+                normalizedName.includes("localiza-tu-coche")
+            );
+
+        }
+
+
+        function shouldUnregisterServiceWorker(registration) {
+
+            const scope =
+                String(registration.scope || "").toLowerCase();
+
+            const currentPath =
+                String(location.pathname || "").toLowerCase();
+
+            return (
+                scope.includes("parking") ||
+                scope.includes("localiza") ||
+                currentPath.includes("parking") ||
+                currentPath.includes("localiza-tu-coche")
+            );
+
+        }
+
+
+        function initializeSupabase() {
+
+            if (!window.supabase) {
+                console.error(
+                    "La librería de Supabase no está disponible."
                 );
 
+                return false;
+            }
 
-            element.className =
-                "user-location";
+            if (
+                !SUPABASE_URL ||
+                !SUPABASE_KEY ||
+                SUPABASE_URL.includes("TU_SUPABASE") ||
+                SUPABASE_KEY.includes("TU_SUPABASE")
+            ) {
+                console.error(
+                    "Falta la configuración de Supabase."
+                );
 
+                return false;
+            }
 
-            userMarker =
-                new maptilersdk.Marker({
+            try {
+                supabaseClient =
+                    window.supabase.createClient(
+                        SUPABASE_URL,
+                        SUPABASE_KEY,
+                        {
+                            auth: {
+                                persistSession: true,
+                                autoRefreshToken: true,
+                                detectSessionInUrl: true
+                            }
+                        }
+                    );
 
-                    element: element
+                return true;
+            }
 
-                })
+            catch (error) {
+                console.error(
+                    "No se pudo iniciar Supabase:",
+                    error
+                );
 
-                .setLngLat([
-
-                    currentLongitude,
-
-                    currentLatitude
-
-                ])
-
-                .addTo(map);
-
-        }
-
-        else {
-
-            userMarker.setLngLat([
-
-                currentLongitude,
-
-                currentLatitude
-
-            ]);
-
-        }
-
-
-        /*
-        Solo centramos automáticamente
-        la primera vez.
-        */
-
-        if (
-            !firstLocationReceived
-        ) {
-
-            map.flyTo({
-
-                center: [
-
-                    currentLongitude,
-
-                    currentLatitude
-
-                ],
-
-                zoom: 18,
-
-                essential: true
-
-            });
-
-
-            firstLocationReceived =
-                true;
+                return false;
+            }
 
         }
 
-    }
+
+        // =====================================================
+        // PANTALLAS
+        // =====================================================
+
+        function showAuthScreen(message) {
+
+            loadingScreen.style.display =
+                "none";
+
+            app.style.display =
+                "none";
+
+            authScreen.style.display =
+                "flex";
+
+            if (message) {
+                showAuthMessage(
+                    loginMessage,
+                    message,
+                    "error"
+                );
+            }
+
+        }
 
 
+        function showApplicationScreen() {
 
-    function locationError(error) {
+            loadingScreen.style.display =
+                "none";
 
-        console.error(
-            "Error de ubicación:",
-            error
-        );
+            authScreen.style.display =
+                "none";
 
-    }
+            app.style.display =
+                "block";
+
+            if (map) {
+                setTimeout(
+                    function() {
+                        map.resize();
+                    },
+                    80
+                );
+            }
+
+        }
 
 
+        function showLoginForm() {
 
-    /* =========================================================
-       BOTÓN CENTRAR
-    ========================================================= */
+            registerForm.style.display =
+                "none";
 
-    document
-        .getElementById(
-            "center-location-button"
-        )
-        .addEventListener(
+            loginForm.style.display =
+                "block";
 
-            "click",
+            clearAuthMessage(loginMessage);
+            clearAuthMessage(registerMessage);
 
-            function() {
+        }
 
-                if (
-                    currentLatitude === null ||
-                    currentLongitude === null
-                ) {
 
-                    getCurrentLocation();
+        function showRegisterForm() {
 
-                    showToast(
-                        "Obteniendo ubicación..."
+            loginForm.style.display =
+                "none";
+
+            registerForm.style.display =
+                "block";
+
+            clearAuthMessage(loginMessage);
+            clearAuthMessage(registerMessage);
+
+        }
+
+
+        // =====================================================
+        // AUTENTICACIÓN
+        // =====================================================
+
+        async function startAuthenticatedApplication(user) {
+
+            currentUser =
+                user;
+
+            currentProfile =
+                await loadProfile(user);
+
+            renderUser();
+
+            showApplicationScreen();
+
+            initializeMap();
+            startLocationTracking();
+
+            await loadGroups();
+            await loadVehicles(true);
+
+            startVehicleRefresh();
+            startElapsedRefresh();
+
+        }
+
+
+        async function loadProfile(user) {
+
+            const fallbackProfile =
+                {
+                    first_name:
+                        user.user_metadata &&
+                        user.user_metadata.first_name
+                            ? user.user_metadata.first_name
+                            : "",
+
+                    last_name:
+                        user.user_metadata &&
+                        user.user_metadata.last_name
+                            ? user.user_metadata.last_name
+                            : ""
+                };
+
+            try {
+                const result =
+                    await supabaseClient
+                        .from("profiles")
+                        .select("first_name,last_name")
+                        .eq("id", user.id)
+                        .maybeSingle();
+
+                if (result.error) {
+                    console.warn(
+                        "No se pudo cargar el perfil:",
+                        result.error
+                    );
+
+                    return fallbackProfile;
+                }
+
+                if (!result.data) {
+                    return fallbackProfile;
+                }
+
+                return result.data;
+            }
+
+            catch (error) {
+                console.warn(
+                    "Error inesperado cargando perfil:",
+                    error
+                );
+
+                return fallbackProfile;
+            }
+
+        }
+
+
+        function renderUser() {
+
+            const firstName =
+                currentProfile &&
+                currentProfile.first_name
+                    ? currentProfile.first_name.trim()
+                    : "";
+
+            const lastName =
+                currentProfile &&
+                currentProfile.last_name
+                    ? currentProfile.last_name.trim()
+                    : "";
+
+            const fullName =
+                (firstName + " " + lastName).trim();
+
+            const email =
+                currentUser && currentUser.email
+                    ? currentUser.email
+                    : "";
+
+            userName.textContent =
+                fullName || "Usuario";
+
+            userEmail.textContent =
+                email;
+
+            const initial =
+                (firstName || email || "P")
+                    .charAt(0)
+                    .toUpperCase();
+
+            userButton.textContent =
+                initial;
+
+        }
+
+
+        async function handleLogin(event) {
+
+            event.preventDefault();
+
+            clearAuthMessage(loginMessage);
+
+            const email =
+                document
+                    .getElementById("login-email")
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById("login-password")
+                    .value;
+
+            const submitButton =
+                loginForm.querySelector("button[type='submit']");
+
+            setButtonLoading(
+                submitButton,
+                true,
+                "Entrando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                if (result.error) {
+                    showAuthMessage(
+                        loginMessage,
+                        "No se pudo iniciar sesión. Revisa el correo y la contraseña.",
+                        "error"
+                    );
+
+                    console.error(
+                        "Error de inicio de sesión:",
+                        result.error
                     );
 
                     return;
-
                 }
 
+                await startAuthenticatedApplication(
+                    result.data.user
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    submitButton,
+                    false
+                );
+            }
+
+        }
+
+
+        async function handleRegister(event) {
+
+            event.preventDefault();
+
+            clearAuthMessage(registerMessage);
+
+            const firstName =
+                document
+                    .getElementById("register-first-name")
+                    .value
+                    .trim();
+
+            const lastName =
+                document
+                    .getElementById("register-last-name")
+                    .value
+                    .trim();
+
+            const email =
+                document
+                    .getElementById("register-email")
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById("register-password")
+                    .value;
+
+            const passwordRepeat =
+                document
+                    .getElementById("register-password-repeat")
+                    .value;
+
+            if (password !== passwordRepeat) {
+                showAuthMessage(
+                    registerMessage,
+                    "Las contraseñas no coinciden.",
+                    "error"
+                );
+
+                return;
+            }
+
+            const submitButton =
+                registerForm.querySelector("button[type='submit']");
+
+            setButtonLoading(
+                submitButton,
+                true,
+                "Creando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                first_name: firstName,
+                                last_name: lastName
+                            }
+                        }
+                    });
+
+                if (result.error) {
+                    showAuthMessage(
+                        registerMessage,
+                        getReadableSupabaseError(result.error),
+                        "error"
+                    );
+
+                    console.error(
+                        "Error creando cuenta:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                if (
+                    result.data &&
+                    result.data.session &&
+                    result.data.user
+                ) {
+                    showAuthMessage(
+                        registerMessage,
+                        "Cuenta creada correctamente.",
+                        "success"
+                    );
+
+                    await startAuthenticatedApplication(
+                        result.data.user
+                    );
+
+                    return;
+                }
+
+                showLoginForm();
+
+                showAuthMessage(
+                    loginMessage,
+                    "Cuenta creada. Si Supabase pide confirmación, revisa tu correo.",
+                    "success"
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    submitButton,
+                    false
+                );
+            }
+
+        }
+
+
+        async function handleLogout() {
+
+            userMenu.style.display =
+                "none";
+
+            if (!supabaseClient) {
+                showAuthScreen();
+                return;
+            }
+
+            const result =
+                await supabaseClient.auth.signOut();
+
+            if (result.error) {
+                showToast(
+                    "No se pudo cerrar la sesión."
+                );
+
+                console.error(
+                    "Error cerrando sesión:",
+                    result.error
+                );
+
+                return;
+            }
+
+            showAuthScreen();
+
+        }
+
+
+        // =====================================================
+        // GRUPOS
+        // =====================================================
+
+        async function loadGroups() {
+
+            if (!supabaseClient || !currentUser) {
+                return;
+            }
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "get_my_groups"
+                    );
+
+                if (result.error) {
+                    userGroups = [];
+
+                    console.error(
+                        "Error cargando grupos:",
+                        result.error
+                    );
+
+                    showToast(
+                        "No se pudieron cargar los grupos."
+                    );
+                }
+
+                else {
+                    userGroups =
+                        Array.isArray(result.data)
+                            ? result.data
+                            : [];
+                }
+
+                renderGroups();
+            }
+
+            catch (error) {
+                userGroups = [];
+
+                console.error(
+                    "Error inesperado cargando grupos:",
+                    error
+                );
+
+                showToast(
+                    "No se pudieron cargar los grupos."
+                );
+
+                renderGroups();
+            }
+
+        }
+
+
+        function renderGroups() {
+
+            dynamicGroups.innerHTML =
+                "";
+
+            userGroups.forEach(
+                function(group) {
+
+                    const option =
+                        document.createElement("div");
+
+                    option.className =
+                        "group-option dynamic-group-option";
+
+                    option.tabIndex =
+                        0;
+
+                    option.dataset.groupId =
+                        group.id;
+
+                    option.dataset.groupName =
+                        group.name;
+
+                    if (selectedGroupId === group.id) {
+                        option.classList.add("active");
+                    }
+
+                    const nameRow =
+                        document.createElement("div");
+
+                    nameRow.className =
+                        "group-name-row";
+
+                    const name =
+                        document.createElement("span");
+
+                    name.className =
+                        "group-name-text";
+
+                    name.textContent =
+                        group.name;
+
+                    nameRow.appendChild(name);
+
+                    if (group.role === "admin") {
+                        const role =
+                            document.createElement("span");
+
+                        role.className =
+                            "group-role";
+
+                        role.textContent =
+                            "admin";
+
+                        nameRow.appendChild(role);
+                    }
+
+                    option.appendChild(nameRow);
+
+                    if (group.join_code) {
+                        const codeRow =
+                            document.createElement("div");
+
+                        codeRow.className =
+                            "group-code-row";
+
+                        const code =
+                            document.createElement("span");
+
+                        code.className =
+                            "group-code-text";
+
+                        code.textContent =
+                            "Código: " + group.join_code;
+
+                        const copyButton =
+                            document.createElement("button");
+
+                        copyButton.type =
+                            "button";
+
+                        copyButton.className =
+                            "copy-group-code";
+
+                        copyButton.textContent =
+                            "Copiar";
+
+                        copyButton.addEventListener(
+                            "click",
+                            function(event) {
+                                event.stopPropagation();
+                                copyText(group.join_code);
+                            }
+                        );
+
+                        codeRow.appendChild(code);
+                        codeRow.appendChild(copyButton);
+
+                        option.appendChild(codeRow);
+                    }
+
+                    option.addEventListener(
+                        "click",
+                        function() {
+                            selectGroup(
+                                group.id,
+                                group.name
+                            );
+                        }
+                    );
+
+                    option.addEventListener(
+                        "keydown",
+                        function(event) {
+                            if (
+                                event.key === "Enter" ||
+                                event.key === " "
+                            ) {
+                                event.preventDefault();
+                                selectGroup(
+                                    group.id,
+                                    group.name
+                                );
+                            }
+                        }
+                    );
+
+                    dynamicGroups.appendChild(option);
+
+                }
+            );
+
+            updateGroupSelectionStyles();
+
+        }
+
+
+        function selectGroup(groupId, groupName) {
+
+            selectedGroupId =
+                groupId;
+
+            selectedGroup.textContent =
+                groupName;
+
+            groupMenu.style.display =
+                "none";
+
+            updateGroupSelectionStyles();
+            renderVehicleMarkers();
+
+        }
+
+
+        function updateGroupSelectionStyles() {
+
+            document
+                .querySelectorAll(".group-option")
+                .forEach(
+                    function(option) {
+                        option.classList.toggle(
+                            "active",
+                            option.dataset.groupId === selectedGroupId
+                        );
+                    }
+                );
+
+        }
+
+
+        function openCreateGroupModal() {
+
+            groupMenu.style.display =
+                "none";
+
+            createGroupNameInput.value =
+                "";
+
+            createGroupDescriptionInput.value =
+                "";
+
+            createGroupModal.style.display =
+                "flex";
+
+            setTimeout(
+                function() {
+                    createGroupNameInput.focus();
+                },
+                50
+            );
+
+        }
+
+
+        function closeCreateGroupModal() {
+
+            createGroupModal.style.display =
+                "none";
+
+        }
+
+
+        async function createGroup() {
+
+            const groupName =
+                createGroupNameInput.value.trim();
+
+            const groupDescription =
+                createGroupDescriptionInput.value.trim();
+
+            if (!groupName) {
+                showToast(
+                    "Introduce un nombre de grupo."
+                );
+
+                createGroupNameInput.focus();
+
+                return;
+            }
+
+            setButtonLoading(
+                createGroupConfirmButton,
+                true,
+                "Creando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "create_group",
+                        {
+                            p_name: groupName,
+                            p_description:
+                                groupDescription || null
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error creando grupo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                const createdGroup =
+                    Array.isArray(result.data)
+                        ? result.data[0]
+                        : result.data;
+
+                closeCreateGroupModal();
+
+                await loadGroups();
+                await loadVehicles(false);
+
+                if (createdGroup && createdGroup.id) {
+                    selectGroup(
+                        createdGroup.id,
+                        createdGroup.name
+                    );
+                }
+
+                if (createdGroup) {
+                    showCreatedGroupModal(createdGroup);
+                }
+
+                showToast(
+                    "Grupo creado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    createGroupConfirmButton,
+                    false
+                );
+            }
+
+        }
+
+
+        function showCreatedGroupModal(group) {
+
+            createdGroupName.textContent =
+                group.name || "Grupo";
+
+            createdGroupCode.textContent =
+                group.join_code || "";
+
+            createdGroupModal.style.display =
+                "flex";
+
+        }
+
+
+        async function joinGroup() {
+
+            const joinCode =
+                normalizeJoinCode(
+                    joinCodeInput.value
+                );
+
+            if (!joinCode) {
+                showToast(
+                    "Introduce un código de grupo."
+                );
+
+                joinCodeInput.focus();
+
+                return;
+            }
+
+            setButtonLoading(
+                joinGroupButton,
+                true,
+                "Uniendo..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "join_group",
+                        {
+                            p_join_code: joinCode
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error uniéndose al grupo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                joinCodeInput.value =
+                    "";
+
+                await loadGroups();
+                await loadVehicles(false);
+
+                const joinedGroup =
+                    userGroups.find(
+                        function(group) {
+                            return group.id === result.data;
+                        }
+                    );
+
+                if (joinedGroup) {
+                    selectGroup(
+                        joinedGroup.id,
+                        joinedGroup.name
+                    );
+                }
+
+                showToast(
+                    "Te has unido al grupo."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    joinGroupButton,
+                    false
+                );
+            }
+
+        }
+
+
+        async function pasteJoinCode() {
+
+            if (
+                !navigator.clipboard ||
+                !navigator.clipboard.readText
+            ) {
+                showToast(
+                    "El navegador no permite pegar automáticamente."
+                );
+
+                joinCodeInput.focus();
+
+                return;
+            }
+
+            try {
+                const text =
+                    await navigator.clipboard.readText();
+
+                joinCodeInput.value =
+                    normalizeJoinCode(text);
+
+                joinCodeInput.focus();
+            }
+
+            catch (error) {
+                console.warn(
+                    "No se pudo leer el portapapeles:",
+                    error
+                );
+
+                showToast(
+                    "No se pudo leer el portapapeles."
+                );
+
+                joinCodeInput.focus();
+            }
+
+        }
+
+
+        // =====================================================
+        // VEHICULOS
+        // =====================================================
+
+        async function loadVehicles(showErrors) {
+
+            if (!supabaseClient || !currentUser) {
+                return;
+            }
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "get_visible_vehicles"
+                    );
+
+                if (result.error) {
+                    vehicles = [];
+
+                    console.error(
+                        "Error cargando vehículos:",
+                        result.error
+                    );
+
+                    if (showErrors !== false) {
+                        showToast(
+                            getReadableSupabaseError(result.error)
+                        );
+                    }
+                }
+
+                else {
+                    vehicles =
+                        Array.isArray(result.data)
+                            ? result.data.map(normalizeVehicle)
+                            : [];
+                }
+
+                renderVehicleMarkers();
+
+                if (parkVehicleModal.style.display === "flex") {
+                    renderParkVehicleList();
+                }
+            }
+
+            catch (error) {
+                vehicles = [];
+
+                console.error(
+                    "Error inesperado cargando vehículos:",
+                    error
+                );
+
+                if (showErrors !== false) {
+                    showToast(
+                        "No se pudieron cargar los vehículos."
+                    );
+                }
+
+                renderVehicleMarkers();
+            }
+
+        }
+
+
+        function normalizeVehicle(vehicle) {
+
+            const markerType =
+                ["dot", "square", "car"].includes(
+                    vehicle.marker_type
+                )
+                    ? vehicle.marker_type
+                    : "dot";
+
+            return {
+                id:
+                    vehicle.id,
+
+                name:
+                    vehicle.name || "Vehículo",
+
+                description:
+                    vehicle.description || "",
+
+                plate:
+                    vehicle.plate || "",
+
+                marker_type:
+                    markerType,
+
+                marker_color:
+                    normalizeMarkerColor(
+                        vehicle.marker_color
+                    ),
+
+                owner_id:
+                    vehicle.owner_id,
+
+                is_owner:
+                    Boolean(vehicle.is_owner),
+
+                group_ids:
+                    getVehicleGroupIds(vehicle),
+
+                is_parked:
+                    Boolean(vehicle.is_parked),
+
+                latitude:
+                    toCoordinate(vehicle.latitude),
+
+                longitude:
+                    toCoordinate(vehicle.longitude),
+
+                parked_at:
+                    vehicle.parked_at || null
+            };
+
+        }
+
+
+        function getVehicleGroupIds(vehicle) {
+
+            if (!Array.isArray(vehicle.group_ids)) {
+                return [];
+            }
+
+            return vehicle.group_ids.filter(Boolean);
+
+        }
+
+
+        function toCoordinate(value) {
+
+            const coordinate =
+                Number(value);
+
+            if (!Number.isFinite(coordinate)) {
+                return null;
+            }
+
+            return coordinate;
+
+        }
+
+
+        function normalizeMarkerColor(value) {
+
+            const color =
+                String(value || "").trim();
+
+            if (/^#[0-9a-fA-F]{6}$/.test(color)) {
+                return color;
+            }
+
+            return "#2388E8";
+
+        }
+
+
+        function startVehicleRefresh() {
+
+            if (vehicleRefreshTimer !== null) {
+                clearInterval(vehicleRefreshTimer);
+            }
+
+            vehicleRefreshTimer =
+                setInterval(
+                    function() {
+                        loadVehicles(false);
+                    },
+                    30000
+                );
+
+        }
+
+
+        function startElapsedRefresh() {
+
+            if (elapsedRefreshTimer !== null) {
+                clearInterval(elapsedRefreshTimer);
+            }
+
+            elapsedRefreshTimer =
+                setInterval(
+                    refreshElapsedDisplays,
+                    30000
+                );
+
+        }
+
+
+        function resetVehicleState() {
+
+            if (vehicleRefreshTimer !== null) {
+                clearInterval(vehicleRefreshTimer);
+                vehicleRefreshTimer = null;
+            }
+
+            if (elapsedRefreshTimer !== null) {
+                clearInterval(elapsedRefreshTimer);
+                elapsedRefreshTimer = null;
+            }
+
+            stopParkingSelection();
+            clearVehicleMarkers();
+            closeVehiclePopup();
+
+            if (createVehicleModal) {
+                createVehicleModal.style.display = "none";
+            }
+
+            if (parkVehicleModal) {
+                parkVehicleModal.style.display = "none";
+            }
+
+        }
+
+
+        function clearVehicleMarkers() {
+
+            vehicleMarkers.forEach(
+                function(marker) {
+                    marker.remove();
+                }
+            );
+
+            vehicleMarkers.clear();
+
+        }
+
+
+        function renderVehicleMarkers() {
+
+            if (!map) {
+                return;
+            }
+
+            const visibleVehicles =
+                vehicles.filter(
+                    isVehicleVisibleInCurrentFilter
+                );
+
+            clearVehicleMarkers();
+
+            visibleVehicles.forEach(
+                function(vehicle) {
+
+                    const markerElement =
+                        createVehicleMarkerElement(vehicle);
+
+                    markerElement.addEventListener(
+                        "click",
+                        function(event) {
+                            event.stopPropagation();
+                            showVehiclePopup(vehicle);
+                        }
+                    );
+
+                    const marker =
+                        new maptilersdk.Marker({
+                            element:
+                                markerElement
+                        })
+                            .setLngLat([
+                                vehicle.longitude,
+                                vehicle.latitude
+                            ])
+                            .addTo(map);
+
+                    vehicleMarkers.set(
+                        vehicle.id,
+                        marker
+                    );
+
+                }
+            );
+
+            if (
+                openVehiclePopupId &&
+                !visibleVehicles.some(
+                    function(vehicle) {
+                        return vehicle.id === openVehiclePopupId;
+                    }
+                )
+            ) {
+                closeVehiclePopup();
+            }
+
+        }
+
+
+        function isVehicleVisibleInCurrentFilter(vehicle) {
+
+            if (
+                !vehicle.is_parked ||
+                vehicle.latitude === null ||
+                vehicle.longitude === null
+            ) {
+                return false;
+            }
+
+            if (selectedGroupId === "all") {
+                return true;
+            }
+
+            if (selectedGroupId === "personal") {
+                return vehicle.group_ids.length === 0;
+            }
+
+            return vehicle.group_ids.includes(
+                selectedGroupId
+            );
+
+        }
+
+
+        function createVehicleMarkerElement(vehicle) {
+
+            const markerElement =
+                document.createElement("div");
+
+            markerElement.className =
+                "vehicle-marker " + vehicle.marker_type;
+
+            markerElement.style.setProperty(
+                "--vehicle-color",
+                vehicle.marker_color
+            );
+
+            markerElement.title =
+                vehicle.name;
+
+            return markerElement;
+
+        }
+
+
+        function openCreateVehicleModal() {
+
+            userMenu.style.display = "none";
+            groupMenu.style.display = "none";
+            layerMenu.style.display = "none";
+
+            vehicleNameInput.value =
+                "";
+
+            vehicleDescriptionInput.value =
+                "";
+
+            vehiclePlateInput.value =
+                "";
+
+            vehicleMarkerTypeSelect.value =
+                "dot";
+
+            vehicleMarkerColorInput.value =
+                "#2388E8";
+
+            renderVehicleGroupList();
+            updateVehicleMarkerPreview();
+
+            createVehicleModal.style.display =
+                "flex";
+
+            setTimeout(
+                function() {
+                    vehicleNameInput.focus();
+                },
+                50
+            );
+
+        }
+
+
+        function closeCreateVehicleModal() {
+
+            createVehicleModal.style.display =
+                "none";
+
+        }
+
+
+        function renderVehicleGroupList() {
+
+            vehicleGroupList.innerHTML =
+                "";
+
+            if (userGroups.length === 0) {
+                const empty =
+                    document.createElement("div");
+
+                empty.className =
+                    "vehicle-empty-state";
+
+                empty.textContent =
+                    "Sin grupos disponibles. Si lo dejas así, el vehículo será personal.";
+
+                vehicleGroupList.appendChild(empty);
+
+                return;
+            }
+
+            userGroups.forEach(
+                function(group) {
+
+                    const label =
+                        document.createElement("label");
+
+                    label.className =
+                        "vehicle-group-choice";
+
+                    const checkbox =
+                        document.createElement("input");
+
+                    checkbox.type =
+                        "checkbox";
+
+                    checkbox.value =
+                        group.id;
+
+                    const name =
+                        document.createElement("span");
+
+                    name.textContent =
+                        group.name;
+
+                    label.appendChild(checkbox);
+                    label.appendChild(name);
+
+                    vehicleGroupList.appendChild(label);
+
+                }
+            );
+
+        }
+
+
+        function updateVehicleMarkerPreview() {
+
+            const markerType =
+                vehicleMarkerTypeSelect.value || "dot";
+
+            const markerColor =
+                normalizeMarkerColor(
+                    vehicleMarkerColorInput.value
+                );
+
+            vehicleMarkerPreview.className =
+                "vehicle-marker " + markerType;
+
+            vehicleMarkerPreview.style.setProperty(
+                "--vehicle-color",
+                markerColor
+            );
+
+        }
+
+
+        function getSelectedVehicleGroupIds() {
+
+            return Array
+                .from(
+                    vehicleGroupList.querySelectorAll(
+                        "input[type='checkbox']:checked"
+                    )
+                )
+                .map(
+                    function(input) {
+                        return input.value;
+                    }
+                );
+
+        }
+
+
+        async function createVehicle() {
+
+            const vehicleName =
+                vehicleNameInput.value.trim();
+
+            const vehicleDescription =
+                vehicleDescriptionInput.value.trim();
+
+            const vehiclePlate =
+                vehiclePlateInput.value.trim();
+
+            const markerType =
+                vehicleMarkerTypeSelect.value || "dot";
+
+            const markerColor =
+                normalizeMarkerColor(
+                    vehicleMarkerColorInput.value
+                );
+
+            const selectedGroupIds =
+                getSelectedVehicleGroupIds();
+
+            if (!vehicleName) {
+                showToast(
+                    "Introduce un nombre de vehículo."
+                );
+
+                vehicleNameInput.focus();
+
+                return;
+            }
+
+            setButtonLoading(
+                createVehicleConfirmButton,
+                true,
+                "Creando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "create_vehicle",
+                        {
+                            p_name:
+                                vehicleName,
+
+                            p_description:
+                                vehicleDescription || null,
+
+                            p_plate:
+                                vehiclePlate || null,
+
+                            p_marker_type:
+                                markerType,
+
+                            p_marker_color:
+                                markerColor,
+
+                            p_group_ids:
+                                selectedGroupIds
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error creando vehículo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                closeCreateVehicleModal();
+
+                await loadVehicles(true);
+
+                showToast(
+                    "Vehículo creado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    createVehicleConfirmButton,
+                    false
+                );
+            }
+
+        }
+
+
+        async function openParkVehicleModal() {
+
+            userMenu.style.display = "none";
+            groupMenu.style.display = "none";
+            layerMenu.style.display = "none";
+
+            setButtonLoading(
+                openParkVehicleButton,
+                true,
+                "Cargando..."
+            );
+
+            try {
+                await loadVehicles(false);
+
+                renderParkVehicleList();
+
+                parkVehicleModal.style.display =
+                    "flex";
+            }
+
+            finally {
+                setButtonLoading(
+                    openParkVehicleButton,
+                    false
+                );
+            }
+
+        }
+
+
+        function closeParkVehicleModal() {
+
+            parkVehicleModal.style.display =
+                "none";
+
+        }
+
+
+        function renderParkVehicleList() {
+
+            parkVehicleList.innerHTML =
+                "";
+
+            const availableVehicles =
+                vehicles.filter(
+                    function(vehicle) {
+                        return !vehicle.is_parked;
+                    }
+                );
+
+            if (availableVehicles.length === 0) {
+                const empty =
+                    document.createElement("div");
+
+                empty.className =
+                    "vehicle-empty-state";
+
+                if (vehicles.length === 0) {
+                    empty.textContent =
+                        "Todavía no tienes vehículos accesibles. Crea uno primero.";
+                }
+
+                else {
+                    empty.textContent =
+                        "Todos los vehículos accesibles ya están aparcados.";
+                }
+
+                parkVehicleList.appendChild(empty);
+
+                return;
+            }
+
+            availableVehicles.forEach(
+                function(vehicle) {
+
+                    const option =
+                        document.createElement("button");
+
+                    option.type =
+                        "button";
+
+                    option.className =
+                        "park-vehicle-option";
+
+                    const info =
+                        document.createElement("div");
+
+                    const name =
+                        document.createElement("div");
+
+                    name.className =
+                        "park-vehicle-name";
+
+                    name.textContent =
+                        vehicle.name;
+
+                    const meta =
+                        document.createElement("div");
+
+                    meta.className =
+                        "park-vehicle-meta";
+
+                    meta.textContent =
+                        getVehicleMetaText(vehicle);
+
+                    info.appendChild(name);
+                    info.appendChild(meta);
+
+                    const markerPreview =
+                        createVehicleMarkerElement(vehicle);
+
+                    option.appendChild(info);
+                    option.appendChild(markerPreview);
+
+                    option.addEventListener(
+                        "click",
+                        function() {
+                            startParkingSelection(
+                                vehicle.id
+                            );
+                        }
+                    );
+
+                    parkVehicleList.appendChild(option);
+
+                }
+            );
+
+        }
+
+
+        function getVehicleMetaText(vehicle) {
+
+            const parts =
+                [];
+
+            if (vehicle.plate) {
+                parts.push(vehicle.plate);
+            }
+
+            if (vehicle.group_ids.length === 0) {
+                parts.push("Personal");
+            }
+
+            else {
+                parts.push(
+                    vehicle.group_ids.length === 1
+                        ? "1 grupo"
+                        : vehicle.group_ids.length + " grupos"
+                );
+            }
+
+            return parts.join(" · ");
+
+        }
+
+
+        function startParkingSelection(vehicleId) {
+
+            const vehicle =
+                getVehicleById(vehicleId);
+
+            if (!vehicle) {
+                showToast(
+                    "No se pudo seleccionar el vehículo."
+                );
+
+                return;
+            }
+
+            parkingSelectionVehicleId =
+                vehicle.id;
+
+            closeParkVehicleModal();
+            closeVehiclePopup();
+
+            app.classList.add(
+                "parking-selection-active"
+            );
+
+            updateParkingPicker();
+
+            if (map) {
+                map.on(
+                    "move",
+                    updateParkingPicker
+                );
+            }
+
+            showToast(
+                "Mueve el mapa y confirma la ubicación."
+            );
+
+        }
+
+
+        function stopParkingSelection() {
+
+            if (map) {
+                map.off(
+                    "move",
+                    updateParkingPicker
+                );
+            }
+
+            parkingSelectionVehicleId =
+                null;
+
+            app.classList.remove(
+                "parking-selection-active"
+            );
+
+        }
+
+
+        function updateParkingPicker() {
+
+            if (!map || !parkingSelectionVehicleId) {
+                return;
+            }
+
+            const vehicle =
+                getVehicleById(
+                    parkingSelectionVehicleId
+                );
+
+            const center =
+                map.getCenter();
+
+            parkingPickerTitle.textContent =
+                vehicle
+                    ? "Aparcar " + vehicle.name
+                    : "Aparcar vehículo";
+
+            parkingPickerCoords.textContent =
+                "Latitud " +
+                center.lat.toFixed(6) +
+                " · Longitud " +
+                center.lng.toFixed(6);
+
+        }
+
+
+        async function confirmParkingSelection() {
+
+            if (!map || !parkingSelectionVehicleId) {
+                return;
+            }
+
+            const center =
+                map.getCenter();
+
+            setButtonLoading(
+                confirmParkingLocationButton,
+                true,
+                "Guardando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "park_vehicle",
+                        {
+                            p_vehicle_id:
+                                parkingSelectionVehicleId,
+
+                            p_latitude:
+                                center.lat,
+
+                            p_longitude:
+                                center.lng
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error aparcando vehículo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                stopParkingSelection();
+
+                await loadVehicles(true);
+
+                showToast(
+                    "Vehículo aparcado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    confirmParkingLocationButton,
+                    false
+                );
+            }
+
+        }
+
+
+        function getVehicleById(vehicleId) {
+
+            return vehicles.find(
+                function(vehicle) {
+                    return vehicle.id === vehicleId;
+                }
+            );
+
+        }
+
+
+        function showVehiclePopup(vehicle) {
+
+            if (!map || !vehicle.is_parked) {
+                return;
+            }
+
+            closeVehiclePopup();
+
+            const content =
+                createVehiclePopupContent(vehicle);
+
+            vehicleInfoPopup =
+                new maptilersdk.Popup({
+                    offset:
+                        26
+                })
+                    .setLngLat([
+                        vehicle.longitude,
+                        vehicle.latitude
+                    ])
+                    .setDOMContent(content)
+                    .addTo(map);
+
+            openVehiclePopupId =
+                vehicle.id;
+
+            vehicleInfoPopup.on(
+                "close",
+                function() {
+                    vehicleInfoPopup = null;
+                    openVehiclePopupId = null;
+                }
+            );
+
+            refreshElapsedDisplays();
+
+        }
+
+
+        function createVehiclePopupContent(vehicle) {
+
+            const container =
+                document.createElement("div");
+
+            container.className =
+                "vehicle-popup";
+
+            const title =
+                document.createElement("div");
+
+            title.className =
+                "vehicle-popup-title";
+
+            title.textContent =
+                vehicle.name;
+
+            container.appendChild(title);
+
+            if (vehicle.plate) {
+                const plate =
+                    document.createElement("div");
+
+                plate.className =
+                    "vehicle-popup-line";
+
+                plate.textContent =
+                    "Matrícula: " + vehicle.plate;
+
+                container.appendChild(plate);
+            }
+
+            const started =
+                document.createElement("div");
+
+            started.className =
+                "vehicle-popup-line vehicle-popup-time";
+
+            started.textContent =
+                "Inicio: " +
+                formatParkedAt(vehicle.parked_at);
+
+            container.appendChild(started);
+
+            const elapsed =
+                document.createElement("div");
+
+            elapsed.className =
+                "vehicle-popup-line";
+
+            elapsed.dataset.parkedAt =
+                vehicle.parked_at || "";
+
+            elapsed.textContent =
+                "Tiempo: " +
+                formatElapsedTime(vehicle.parked_at);
+
+            container.appendChild(elapsed);
+
+            const unparkButton =
+                document.createElement("button");
+
+            unparkButton.type =
+                "button";
+
+            unparkButton.className =
+                "vehicle-unpark-button";
+
+            unparkButton.textContent =
+                "Desaparcar";
+
+            unparkButton.addEventListener(
+                "click",
+                function() {
+                    unparkVehicle(
+                        vehicle.id,
+                        unparkButton
+                    );
+                }
+            );
+
+            container.appendChild(unparkButton);
+
+            return container;
+
+        }
+
+
+        async function unparkVehicle(vehicleId, button) {
+
+            setButtonLoading(
+                button,
+                true,
+                "Desaparcando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "unpark_vehicle",
+                        {
+                            p_vehicle_id:
+                                vehicleId
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error desaparcar vehículo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                closeVehiclePopup();
+
+                await loadVehicles(true);
+
+                showToast(
+                    "Vehículo desaparcado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    button,
+                    false
+                );
+            }
+
+        }
+
+
+        function closeVehiclePopup() {
+
+            if (vehicleInfoPopup) {
+                vehicleInfoPopup.remove();
+            }
+
+            vehicleInfoPopup =
+                null;
+
+            openVehiclePopupId =
+                null;
+
+        }
+
+
+        function refreshElapsedDisplays() {
+
+            document
+                .querySelectorAll("[data-parked-at]")
+                .forEach(
+                    function(element) {
+                        element.textContent =
+                            "Tiempo: " +
+                            formatElapsedTime(
+                                element.dataset.parkedAt
+                            );
+                    }
+                );
+
+        }
+
+
+        function formatParkedAt(value) {
+
+            if (!value) {
+                return "Sin hora";
+            }
+
+            const date =
+                new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return "Sin hora";
+            }
+
+            return date.toLocaleString(
+                "es-ES",
+                {
+                    day:
+                        "2-digit",
+
+                    month:
+                        "2-digit",
+
+                    hour:
+                        "2-digit",
+
+                    minute:
+                        "2-digit"
+                }
+            );
+
+        }
+
+
+        function formatElapsedTime(value) {
+
+            if (!value) {
+                return "sin datos";
+            }
+
+            const startedAt =
+                new Date(value);
+
+            if (Number.isNaN(startedAt.getTime())) {
+                return "sin datos";
+            }
+
+            const elapsedMilliseconds =
+                Date.now() - startedAt.getTime();
+
+            if (elapsedMilliseconds < 0) {
+                return "menos de 1 min";
+            }
+
+            const totalMinutes =
+                Math.floor(
+                    elapsedMilliseconds / 60000
+                );
+
+            if (totalMinutes < 1) {
+                return "menos de 1 min";
+            }
+
+            const days =
+                Math.floor(totalMinutes / 1440);
+
+            const hours =
+                Math.floor(
+                    (totalMinutes % 1440) / 60
+                );
+
+            const minutes =
+                totalMinutes % 60;
+
+            if (days > 0) {
+                return (
+                    days +
+                    " d " +
+                    hours +
+                    " h"
+                );
+            }
+
+            if (hours > 0) {
+                return (
+                    hours +
+                    " h " +
+                    minutes +
+                    " min"
+                );
+            }
+
+            return minutes + " min";
+
+        }
+
+
+        // =====================================================
+        // MAPA
+        // =====================================================
+
+        function initializeMap() {
+
+            if (map) {
+                return;
+            }
+
+            if (!window.maptilersdk) {
+                showToast(
+                    "No se pudo cargar el mapa."
+                );
+
+                console.error(
+                    "La librería de MapTiler no está disponible."
+                );
+
+                return;
+            }
+
+            maptilersdk.config.apiKey =
+                MAPTILER_API_KEY;
+
+            map =
+                new maptilersdk.Map({
+
+                    container: "map",
+
+                    style:
+                        maptilersdk
+                            .MapStyle
+                            .STREETS,
+
+                    center: [
+                        -3.7038,
+                        40.4168
+                    ],
+
+                    zoom: 15,
+
+                    navigationControl: false,
+
+                    geolocateControl: false
+
+                });
+
+        }
+
+
+        function startLocationTracking() {
+
+            if (locationWatchId !== null) {
+                return;
+            }
+
+            if (!("geolocation" in navigator)) {
+                showToast(
+                    "Este navegador no permite obtener ubicación."
+                );
+
+                return;
+            }
+
+            locationWatchId =
+                navigator
+                    .geolocation
+                    .watchPosition(
+
+                        updateUserLocation,
+
+                        locationError,
+
+                        {
+                            enableHighAccuracy:
+                                true,
+
+                            maximumAge:
+                                10000,
+
+                            timeout:
+                                15000
+                        }
+
+                    );
+
+        }
+
+
+        function updateUserLocation(position) {
+
+            currentLatitude =
+                position.coords.latitude;
+
+            currentLongitude =
+                position.coords.longitude;
+
+            if (!map) {
+                return;
+            }
+
+            if (userMarker === null) {
+
+                const markerElement =
+                    document.createElement("div");
+
+                markerElement.className =
+                    "user-location";
+
+                userMarker =
+                    new maptilersdk.Marker({
+
+                        element:
+                            markerElement
+
+                    })
+
+                    .setLngLat([
+
+                        currentLongitude,
+
+                        currentLatitude
+
+                    ])
+
+                    .addTo(map);
+
+            }
+
+            else {
+
+                userMarker.setLngLat([
+
+                    currentLongitude,
+
+                    currentLatitude
+
+                ]);
+
+            }
+
+            if (!firstLocationReceived) {
 
                 map.flyTo({
 
@@ -1982,2334 +5150,595 @@
 
                 });
 
+                firstLocationReceived =
+                    true;
+
             }
-
-        );
-
-
-
-    /* =========================================================
-       CAPAS
-    ========================================================= */
-
-    const layerButton =
-        document.getElementById(
-            "layer-button"
-        );
-
-
-    const layerMenu =
-        document.getElementById(
-            "layer-menu"
-        );
-
-
-    layerButton.addEventListener(
-
-        "click",
-
-        function(event) {
-
-            event.stopPropagation();
-
-
-            groupMenu.style.display =
-                "none";
-
-
-            layerMenu.style.display =
-                layerMenu.style.display ===
-                "block"
-
-                ? "none"
-
-                : "block";
 
         }
 
-    );
+
+        function locationError(error) {
+
+            console.error(
+                "Error de geolocalización:",
+                error
+            );
+
+            if (error.code === error.PERMISSION_DENIED) {
+                showToast(
+                    "Activa el permiso de ubicación para ver tu posición."
+                );
+            }
+
+        }
 
 
+        function centerOnUserLocation() {
 
-    document
-        .querySelectorAll(
-            ".layer-option"
-        )
-        .forEach(
+            if (
+                currentLatitude === null ||
+                currentLongitude === null ||
+                !map
+            ) {
+                showToast(
+                    "Todavía no hay ubicación disponible."
+                );
 
-            function(option) {
+                return;
+            }
 
-                option.addEventListener(
+            map.flyTo({
 
-                    "click",
+                center: [
 
-                    function() {
+                    currentLongitude,
 
-                        const style =
-                            this.dataset.style;
+                    currentLatitude
 
+                ],
 
-                        if (
-                            style === "streets"
-                        ) {
+                zoom: 18,
 
-                            map.setStyle(
+                essential:
+                    true
 
-                                maptilersdk
-                                    .MapStyle
-                                    .STREETS
+            });
 
-                            );
-
-                        }
-
-
-                        if (
-                            style === "satellite"
-                        ) {
-
-                            map.setStyle(
-
-                                maptilersdk
-                                    .MapStyle
-                                    .SATELLITE
-
-                            );
-
-                        }
+        }
 
 
-                        if (
-                            style === "hybrid"
-                        ) {
+        function changeMapStyle(styleId) {
 
-                            map.setStyle(
+            if (!map || !window.maptilersdk) {
+                return;
+            }
 
-                                maptilersdk
-                                    .MapStyle
-                                    .HYBRID
+            if (styleId === "streets") {
+                map.setStyle(
+                    maptilersdk.MapStyle.STREETS
+                );
+            }
 
-                            );
+            if (styleId === "satellite") {
+                map.setStyle(
+                    maptilersdk.MapStyle.SATELLITE
+                );
+            }
 
-                        }
+            if (styleId === "hybrid") {
+                map.setStyle(
+                    maptilersdk.MapStyle.HYBRID
+                );
+            }
+
+            layerMenu.style.display =
+                "none";
+
+        }
 
 
-                        layerMenu.style.display =
-                            "none";
+        // =====================================================
+        // EVENTOS
+        // =====================================================
 
+        function attachInterfaceEvents() {
+
+            showRegisterButton.addEventListener(
+                "click",
+                showRegisterForm
+            );
+
+            showLoginButton.addEventListener(
+                "click",
+                showLoginForm
+            );
+
+            loginForm.addEventListener(
+                "submit",
+                handleLogin
+            );
+
+            registerForm.addEventListener(
+                "submit",
+                handleRegister
+            );
+
+            userButton.addEventListener(
+                "click",
+                function(event) {
+                    event.stopPropagation();
+                    toggleMenu(userMenu);
+                    groupMenu.style.display = "none";
+                    layerMenu.style.display = "none";
+                }
+            );
+
+            logoutButton.addEventListener(
+                "click",
+                handleLogout
+            );
+
+            groupButton.addEventListener(
+                "click",
+                function(event) {
+                    event.stopPropagation();
+                    toggleMenu(groupMenu);
+                    userMenu.style.display = "none";
+                    layerMenu.style.display = "none";
+                }
+            );
+
+            document
+                .querySelectorAll("[data-group-id]")
+                .forEach(
+                    function(option) {
+                        option.addEventListener(
+                            "click",
+                            function() {
+                                selectGroup(
+                                    option.dataset.groupId,
+                                    option.dataset.groupName
+                                );
+                            }
+                        );
+                    }
+                );
+
+            openCreateGroupButton.addEventListener(
+                "click",
+                openCreateGroupModal
+            );
+
+            cancelCreateGroupButton.addEventListener(
+                "click",
+                closeCreateGroupModal
+            );
+
+            createGroupConfirmButton.addEventListener(
+                "click",
+                createGroup
+            );
+
+            createGroupNameInput.addEventListener(
+                "keydown",
+                function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        createGroup();
+                    }
+                }
+            );
+
+            closeCreatedGroupButton.addEventListener(
+                "click",
+                function() {
+                    createdGroupModal.style.display = "none";
+                }
+            );
+
+            copyCreatedCodeButton.addEventListener(
+                "click",
+                function() {
+                    copyText(
+                        createdGroupCode.textContent
+                    );
+                }
+            );
+
+            joinCodeInput.addEventListener(
+                "input",
+                function() {
+                    joinCodeInput.value =
+                        normalizeJoinCode(
+                            joinCodeInput.value
+                        );
+                }
+            );
+
+            joinCodeInput.addEventListener(
+                "keydown",
+                function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        joinGroup();
+                    }
+                }
+            );
+
+            pasteCodeButton.addEventListener(
+                "click",
+                pasteJoinCode
+            );
+
+            joinGroupButton.addEventListener(
+                "click",
+                joinGroup
+            );
+
+            layerButton.addEventListener(
+                "click",
+                function(event) {
+                    event.stopPropagation();
+                    toggleMenu(layerMenu);
+                    userMenu.style.display = "none";
+                    groupMenu.style.display = "none";
+                }
+            );
+
+            centerLocationButton.addEventListener(
+                "click",
+                centerOnUserLocation
+            );
+
+            openCreateVehicleButton.addEventListener(
+                "click",
+                openCreateVehicleModal
+            );
+
+            cancelCreateVehicleButton.addEventListener(
+                "click",
+                closeCreateVehicleModal
+            );
+
+            createVehicleConfirmButton.addEventListener(
+                "click",
+                createVehicle
+            );
+
+            vehicleNameInput.addEventListener(
+                "keydown",
+                function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        createVehicle();
+                    }
+                }
+            );
+
+            vehicleMarkerTypeSelect.addEventListener(
+                "change",
+                updateVehicleMarkerPreview
+            );
+
+            vehicleMarkerColorInput.addEventListener(
+                "input",
+                updateVehicleMarkerPreview
+            );
+
+            openParkVehicleButton.addEventListener(
+                "click",
+                openParkVehicleModal
+            );
+
+            cancelParkVehicleButton.addEventListener(
+                "click",
+                closeParkVehicleModal
+            );
+
+            cancelParkingSelectionButton.addEventListener(
+                "click",
+                stopParkingSelection
+            );
+
+            confirmParkingLocationButton.addEventListener(
+                "click",
+                confirmParkingSelection
+            );
+
+            document
+                .querySelectorAll(".layer-option")
+                .forEach(
+                    function(option) {
+                        option.addEventListener(
+                            "click",
+                            function() {
+                                changeMapStyle(
+                                    option.dataset.style
+                                );
+                            }
+                        );
+                    }
+                );
+
+            document.addEventListener(
+                "click",
+                function(event) {
+
+                    if (
+                        !userMenu.contains(event.target) &&
+                        !userButton.contains(event.target)
+                    ) {
+                        userMenu.style.display = "none";
                     }
 
-                );
-
-            }
-
-        );
-
-
-
-    /* =========================================================
-       CAMBIAR LOGIN / REGISTRO
-    ========================================================= */
-
-    document
-        .getElementById(
-            "show-register"
-        )
-        .addEventListener(
-
-            "click",
-
-            function() {
-
-                loginForm.style.display =
-                    "none";
-
-
-                registerForm.style.display =
-                    "block";
-
-            }
-
-        );
-
-
-    document
-        .getElementById(
-            "show-login"
-        )
-        .addEventListener(
-
-            "click",
-
-            function() {
-
-                registerForm.style.display =
-                    "none";
-
-
-                loginForm.style.display =
-                    "block";
-
-            }
-
-        );
-
-
-
-    /* =========================================================
-       REGISTRO
-    ========================================================= */
-
-    registerForm.addEventListener(
-
-        "submit",
-
-        async function(event) {
-
-            event.preventDefault();
-
-
-            clearAuthMessages();
-
-
-            if (!supabaseClient) {
-
-                showAuthMessage(
-
-                    "register-message",
-
-                    "No se ha podido iniciar Supabase.",
-
-                    "error"
-
-                );
-
-                return;
-
-            }
-
-
-            const firstName =
-                document
-                    .getElementById(
-                        "register-first-name"
-                    )
-                    .value
-                    .trim();
-
-
-            const lastName =
-                document
-                    .getElementById(
-                        "register-last-name"
-                    )
-                    .value
-                    .trim();
-
-
-            const email =
-                document
-                    .getElementById(
-                        "register-email"
-                    )
-                    .value
-                    .trim();
-
-
-            const password =
-                document
-                    .getElementById(
-                        "register-password"
-                    )
-                    .value;
-
-
-            const repeatPassword =
-                document
-                    .getElementById(
-                        "register-password-repeat"
-                    )
-                    .value;
-
-
-
-            if (
-                password !==
-                repeatPassword
-            ) {
-
-                showAuthMessage(
-
-                    "register-message",
-
-                    "Las contraseñas no coinciden.",
-
-                    "error"
-
-                );
-
-                return;
-
-            }
-
-
-            if (
-                password.length < 8
-            ) {
-
-                showAuthMessage(
-
-                    "register-message",
-
-                    "La contraseña debe tener al menos 8 caracteres.",
-
-                    "error"
-
-                );
-
-                return;
-
-            }
-
-
-            try {
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabaseClient
-                        .auth
-                        .signUp({
-
-                            email: email,
-
-                            password: password,
-
-                            options: {
-
-                                data: {
-
-                                    first_name:
-                                        firstName,
-
-                                    last_name:
-                                        lastName
-
-                                }
-
-                            }
-
-                        });
-
-
-
-                if (error) {
-
-                    showAuthMessage(
-
-                        "register-message",
-
-                        translateAuthError(
-                            error.message
-                        ),
-
-                        "error"
-
-                    );
-
-                    return;
+                    if (
+                        !groupMenu.contains(event.target) &&
+                        !groupButton.contains(event.target)
+                    ) {
+                        groupMenu.style.display = "none";
+                    }
+
+                    if (
+                        !layerMenu.contains(event.target) &&
+                        !layerButton.contains(event.target)
+                    ) {
+                        layerMenu.style.display = "none";
+                    }
 
                 }
+            );
+
+            createGroupModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === createGroupModal) {
+                        closeCreateGroupModal();
+                    }
+                }
+            );
+
+            createdGroupModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === createdGroupModal) {
+                        createdGroupModal.style.display = "none";
+                    }
+                }
+            );
+
+            createVehicleModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === createVehicleModal) {
+                        closeCreateVehicleModal();
+                    }
+                }
+            );
+
+            parkVehicleModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === parkVehicleModal) {
+                        closeParkVehicleModal();
+                    }
+                }
+            );
+
+        }
 
 
+        // =====================================================
+        // UTILIDADES
+        // =====================================================
 
+        function toggleMenu(menu) {
+
+            if (menu.style.display === "block") {
+                menu.style.display =
+                    "none";
+            }
+
+            else {
+                menu.style.display =
+                    "block";
+            }
+
+        }
+
+
+        function normalizeJoinCode(value) {
+
+            return String(value || "")
+                .trim()
+                .replace(/\s+/g, "")
+                .toUpperCase();
+
+        }
+
+
+        async function copyText(text) {
+
+            const value =
+                String(text || "").trim();
+
+            if (!value) {
+                return;
+            }
+
+            try {
                 if (
-                    data.session
+                    navigator.clipboard &&
+                    navigator.clipboard.writeText
                 ) {
-
-                    await showApplication(
-                        data.user
-                    );
-
+                    await navigator.clipboard.writeText(value);
                 }
 
                 else {
+                    const temporaryInput =
+                        document.createElement("input");
 
-                    showAuthMessage(
+                    temporaryInput.value =
+                        value;
 
-                        "register-message",
-
-                        "Cuenta creada. Revisa el correo electrónico para continuar.",
-
-                        "success"
-
+                    document.body.appendChild(
+                        temporaryInput
                     );
 
+                    temporaryInput.select();
+
+                    document.execCommand("copy");
+
+                    document.body.removeChild(
+                        temporaryInput
+                    );
                 }
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Error registro:",
-                    error
-                );
-
-
-                showAuthMessage(
-
-                    "register-message",
-
-                    "No se ha podido crear la cuenta.",
-
-                    "error"
-
-                );
-
-            }
-
-        }
-
-    );
-
-
-
-    /* =========================================================
-       LOGIN
-    ========================================================= */
-
-    loginForm.addEventListener(
-
-        "submit",
-
-        async function(event) {
-
-            event.preventDefault();
-
-
-            clearAuthMessages();
-
-
-            if (!supabaseClient) {
-
-                showAuthMessage(
-
-                    "login-message",
-
-                    "No se ha podido iniciar Supabase.",
-
-                    "error"
-
-                );
-
-                return;
-
-            }
-
-
-            const email =
-                document
-                    .getElementById(
-                        "login-email"
-                    )
-                    .value
-                    .trim();
-
-
-            const password =
-                document
-                    .getElementById(
-                        "login-password"
-                    )
-                    .value;
-
-
-            try {
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabaseClient
-                        .auth
-                        .signInWithPassword({
-
-                            email: email,
-
-                            password: password
-
-                        });
-
-
-
-                if (error) {
-
-                    showAuthMessage(
-
-                        "login-message",
-
-                        "Correo o contraseña incorrectos.",
-
-                        "error"
-
-                    );
-
-                    return;
-
-                }
-
-
-                await showApplication(
-                    data.user
-                );
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Error login:",
-                    error
-                );
-
-
-                showAuthMessage(
-
-                    "login-message",
-
-                    "No se ha podido conectar con Supabase.",
-
-                    "error"
-
-                );
-
-            }
-
-        }
-
-    );
-
-
-
-    /* =========================================================
-       SESIÓN INICIAL
-    ========================================================= */
-
-    async function checkInitialSession() {
-
-        try {
-
-            if (!supabaseClient) {
-
-                throw new Error(
-                    "Cliente Supabase no inicializado"
-                );
-
-            }
-
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .auth
-                    .getSession();
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-
-            loadingScreen.style.display =
-                "none";
-
-
-            if (
-                data.session
-            ) {
-
-                await showApplication(
-                    data.session.user
-                );
-
-            }
-
-            else {
-
-                showAuthentication();
-
-            }
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error iniciando Supabase:",
-                error
-            );
-
-
-            loadingScreen.style.display =
-                "none";
-
-
-            authScreen.style.display =
-                "flex";
-
-
-            showAuthMessage(
-
-                "login-message",
-
-                "No se ha podido conectar con Supabase. Revisa la configuración.",
-
-                "error"
-
-            );
-
-        }
-
-    }
-
-
-
-    /* =========================================================
-       CAMBIOS DE SESIÓN
-    ========================================================= */
-
-    if (
-        supabaseClient
-    ) {
-
-        supabaseClient
-            .auth
-            .onAuthStateChange(
-
-                function(
-                    event,
-                    session
-                ) {
-
-                    if (
-                        event ===
-                        "SIGNED_OUT"
-                    ) {
-
-                        showAuthentication();
-
-                    }
-
-                }
-
-            );
-
-    }
-
-
-
-    /* =========================================================
-       MOSTRAR APP
-    ========================================================= */
-
-    async function showApplication(user) {
-
-        loadingScreen.style.display =
-            "none";
-
-
-        authScreen.style.display =
-            "none";
-
-
-        app.style.display =
-            "block";
-
-
-        await Promise.all([
-
-            loadUserProfile(
-                user
-            ),
-
-            loadGroups()
-
-        ]);
-
-
-        initializeMap();
-
-
-        setTimeout(
-
-            function() {
-
-                if (
-                    map
-                ) {
-
-                    map.resize();
-
-                }
-
-            },
-
-            100
-
-        );
-
-    }
-
-
-
-    function showAuthentication() {
-
-        loadingScreen.style.display =
-            "none";
-
-
-        app.style.display =
-            "none";
-
-
-        authScreen.style.display =
-            "flex";
-
-
-        loginForm.style.display =
-            "block";
-
-
-        registerForm.style.display =
-            "none";
-
-
-        clearAuthMessages();
-
-    }
-
-
-
-    /* =========================================================
-       PERFIL
-    ========================================================= */
-
-    async function loadUserProfile(user) {
-
-        document
-            .getElementById(
-                "user-email"
-            )
-            .textContent =
-            user.email || "";
-
-
-        try {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-
-                    .from(
-                        "profiles"
-                    )
-
-                    .select(
-                        "first_name, last_name"
-                    )
-
-                    .eq(
-                        "id",
-                        user.id
-                    )
-
-                    .single();
-
-
-            if (
-                !error &&
-                data
-            ) {
-
-                document
-                    .getElementById(
-                        "user-name"
-                    )
-                    .textContent =
-                    (
-                        data.first_name +
-                        " " +
-                        data.last_name
-                    ).trim();
-
-            }
-
-            else {
-
-                document
-                    .getElementById(
-                        "user-name"
-                    )
-                    .textContent =
-                    "Usuario";
-
-            }
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error cargando perfil:",
-                error
-            );
-
-        }
-
-    }
-
-
-
-    /* =========================================================
-       MENÚ USUARIO
-    ========================================================= */
-
-    const userMenu =
-        document.getElementById(
-            "user-menu"
-        );
-
-
-    document
-        .getElementById(
-            "user-button"
-        )
-        .addEventListener(
-
-            "click",
-
-            function(event) {
-
-                event.stopPropagation();
-
-
-                groupMenu.style.display =
-                    "none";
-
-
-                layerMenu.style.display =
-                    "none";
-
-
-                userMenu.style.display =
-                    userMenu.style.display ===
-                    "block"
-
-                    ? "none"
-
-                    : "block";
-
-            }
-
-        );
-
-
-
-    /* =========================================================
-       CERRAR SESIÓN
-    ========================================================= */
-
-    document
-        .getElementById(
-            "logout-button"
-        )
-        .addEventListener(
-
-            "click",
-
-            async function() {
-
-                if (
-                    !supabaseClient
-                ) {
-
-                    return;
-
-                }
-
-
-                await supabaseClient
-                    .auth
-                    .signOut();
-
-
-                userMenu.style.display =
-                    "none";
-
-
-                userGroups = [];
-
-
-                selectGroup(
-                    "all",
-                    null,
-                    "Todos"
-                );
-
-            }
-
-        );
-
-
-
-    /* =========================================================
-       CARGAR GRUPOS
-    ========================================================= */
-
-    async function loadGroups(
-        preferredGroupId = null
-    ) {
-
-        if (
-            !supabaseClient
-        ) {
-
-            return;
-
-        }
-
-
-        try {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .rpc(
-                        "get_my_groups"
-                    );
-
-
-            if (
-                error
-            ) {
-
-                throw error;
-
-            }
-
-
-            userGroups =
-                Array.isArray(data)
-                    ? data
-                    : [];
-
-
-            renderGroups();
-
-
-            /*
-            Si acabamos de crear o unirnos
-            a un grupo, lo seleccionamos.
-            */
-
-            if (
-                preferredGroupId
-            ) {
-
-                const group =
-                    userGroups.find(
-
-                        function(item) {
-
-                            return (
-                                item.id ===
-                                preferredGroupId
-                            );
-
-                        }
-
-                    );
-
-
-                if (
-                    group
-                ) {
-
-                    selectGroup(
-
-                        "group",
-
-                        group.id,
-
-                        group.name
-
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            /*
-            Si ya había un grupo seleccionado,
-            intentamos mantenerlo.
-            */
-
-            if (
-                selectedGroup.type ===
-                "group"
-            ) {
-
-                const stillExists =
-                    userGroups.find(
-
-                        function(item) {
-
-                            return (
-                                item.id ===
-                                selectedGroup.id
-                            );
-
-                        }
-
-                    );
-
-
-                if (
-                    !stillExists
-                ) {
-
-                    selectGroup(
-                        "all",
-                        null,
-                        "Todos"
-                    );
-
-                }
-
-            }
-
-
-            updateActiveGroupOption();
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error cargando grupos:",
-                error
-            );
-
-
-            showToast(
-                "No se han podido cargar los grupos."
-            );
-
-        }
-
-    }
-
-
-
-    /* =========================================================
-       PINTAR GRUPOS EN EL MENÚ
-    ========================================================= */
-
-    function renderGroups() {
-
-        dynamicGroups.innerHTML =
-            "";
-
-
-        if (
-            userGroups.length === 0
-        ) {
-
-            return;
-
-        }
-
-
-        userGroups.forEach(
-
-            function(group) {
-
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-
-                button.type =
-                    "button";
-
-
-                button.className =
-                    "group-option dynamic-group-option";
-
-
-                button.dataset.groupId =
-                    group.id;
-
-
-                const name =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                name.textContent =
-                    group.name;
-
-
-                button.appendChild(
-                    name
-                );
-
-
-                if (
-                    group.role ===
-                    "admin"
-                ) {
-
-                    const role =
-                        document.createElement(
-                            "span"
-                        );
-
-
-                    role.className =
-                        "group-role";
-
-
-                    role.textContent =
-                        "admin";
-
-
-                    button.appendChild(
-                        role
-                    );
-
-                }
-
-
-                button.addEventListener(
-
-                    "click",
-
-                    function() {
-
-                        selectGroup(
-
-                            "group",
-
-                            group.id,
-
-                            group.name
-
-                        );
-
-
-                        groupMenu.style.display =
-                            "none";
-
-                    }
-
-                );
-
-
-                dynamicGroups.appendChild(
-                    button
-                );
-
-            }
-
-        );
-
-
-        updateActiveGroupOption();
-
-    }
-
-
-
-    /* =========================================================
-       SELECCIONAR GRUPO
-    ========================================================= */
-
-    function selectGroup(
-        type,
-        id,
-        name
-    ) {
-
-        selectedGroup = {
-
-            type: type,
-
-            id: id,
-
-            name: name
-
-        };
-
-
-        selectedGroupLabel.textContent =
-            name;
-
-
-        updateActiveGroupOption();
-
-
-        /*
-        Más adelante esta función será también
-        la que filtre los vehículos del mapa.
-        */
-
-        console.log(
-            "Grupo seleccionado:",
-            selectedGroup
-        );
-
-    }
-
-
-
-    function updateActiveGroupOption() {
-
-        document
-            .getElementById(
-                "all-groups-option"
-            )
-            .classList
-            .toggle(
-
-                "active",
-
-                selectedGroup.type ===
-                "all"
-
-            );
-
-
-        document
-            .getElementById(
-                "personal-group-option"
-            )
-            .classList
-            .toggle(
-
-                "active",
-
-                selectedGroup.type ===
-                "personal"
-
-            );
-
-
-        document
-            .querySelectorAll(
-                ".dynamic-group-option"
-            )
-            .forEach(
-
-                function(button) {
-
-                    button
-                        .classList
-                        .toggle(
-
-                            "active",
-
-                            selectedGroup.type ===
-                            "group"
-
-                            &&
-
-                            selectedGroup.id ===
-                            button.dataset.groupId
-
-                        );
-
-                }
-
-            );
-
-    }
-
-
-
-    /* =========================================================
-       BOTÓN DESPLEGABLE GRUPOS
-    ========================================================= */
-
-    groupButton.addEventListener(
-
-        "click",
-
-        function(event) {
-
-            event.stopPropagation();
-
-
-            userMenu.style.display =
-                "none";
-
-
-            layerMenu.style.display =
-                "none";
-
-
-            groupMenu.style.display =
-                groupMenu.style.display ===
-                "block"
-
-                ? "none"
-
-                : "block";
-
-        }
-
-    );
-
-
-
-    document
-        .getElementById(
-            "all-groups-option"
-        )
-        .addEventListener(
-
-            "click",
-
-            function() {
-
-                selectGroup(
-
-                    "all",
-
-                    null,
-
-                    "Todos"
-
-                );
-
-
-                groupMenu.style.display =
-                    "none";
-
-            }
-
-        );
-
-
-
-    document
-        .getElementById(
-            "personal-group-option"
-        )
-        .addEventListener(
-
-            "click",
-
-            function() {
-
-                selectGroup(
-
-                    "personal",
-
-                    null,
-
-                    "Personal"
-
-                );
-
-
-                groupMenu.style.display =
-                    "none";
-
-            }
-
-        );
-
-
-
-    /* =========================================================
-       CREAR GRUPO
-    ========================================================= */
-
-    const createGroupModal =
-        document.getElementById(
-            "create-group-modal"
-        );
-
-
-    const groupCreatedModal =
-        document.getElementById(
-            "group-created-modal"
-        );
-
-
-    document
-        .getElementById(
-            "open-create-group"
-        )
-        .addEventListener(
-
-            "click",
-
-            function() {
-
-                groupMenu.style.display =
-                    "none";
-
-
-                document
-                    .getElementById(
-                        "new-group-name"
-                    )
-                    .value =
-                    "";
-
-
-                document
-                    .getElementById(
-                        "new-group-description"
-                    )
-                    .value =
-                    "";
-
-
-                createGroupModal.style.display =
-                    "flex";
-
-
-                setTimeout(
-
-                    function() {
-
-                        document
-                            .getElementById(
-                                "new-group-name"
-                            )
-                            .focus();
-
-                    },
-
-                    100
-
-                );
-
-            }
-
-        );
-
-
-
-    document
-        .getElementById(
-            "cancel-create-group"
-        )
-        .addEventListener(
-
-            "click",
-
-            function() {
-
-                createGroupModal.style.display =
-                    "none";
-
-            }
-
-        );
-
-
-
-    document
-        .getElementById(
-            "create-group-button"
-        )
-        .addEventListener(
-
-            "click",
-
-            createGroup
-
-        );
-
-
-
-    async function createGroup() {
-
-        const name =
-            document
-                .getElementById(
-                    "new-group-name"
-                )
-                .value
-                .trim();
-
-
-        const description =
-            document
-                .getElementById(
-                    "new-group-description"
-                )
-                .value
-                .trim();
-
-
-        if (
-            !name
-        ) {
-
-            showToast(
-                "Introduce un nombre para el grupo."
-            );
-
-            return;
-
-        }
-
-
-        const button =
-            document.getElementById(
-                "create-group-button"
-            );
-
-
-        button.disabled =
-            true;
-
-
-        button.textContent =
-            "Creando...";
-
-
-        try {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .rpc(
-
-                        "create_group",
-
-                        {
-
-                            p_name:
-                                name,
-
-                            p_description:
-                                description || null
-
-                        }
-
-                    );
-
-
-            if (
-                error
-            ) {
-
-                throw error;
-
-            }
-
-
-            if (
-                !Array.isArray(data) ||
-                data.length === 0
-            ) {
-
-                throw new Error(
-                    "Supabase no ha devuelto el grupo creado."
-                );
-
-            }
-
-
-            const newGroup =
-                data[0];
-
-
-            createGroupModal.style.display =
-                "none";
-
-
-            document
-                .getElementById(
-                    "created-group-name"
-                )
-                .textContent =
-                newGroup.name;
-
-
-            document
-                .getElementById(
-                    "created-group-code"
-                )
-                .textContent =
-                newGroup.join_code;
-
-
-            groupCreatedModal.style.display =
-                "flex";
-
-
-            await loadGroups(
-                newGroup.id
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error creando grupo:",
-                error
-            );
-
-
-            showToast(
-                getFriendlyGroupError(
-                    error
-                )
-            );
-
-        }
-
-        finally {
-
-            button.disabled =
-                false;
-
-
-            button.textContent =
-                "Crear";
-
-        }
-
-    }
-
-
-
-    /* =========================================================
-       COPIAR CÓDIGO DE GRUPO CREADO
-    ========================================================= */
-
-    document
-        .getElementById(
-            "copy-created-code"
-        )
-        .addEventListener(
-
-            "click",
-
-            async function() {
-
-                const code =
-                    document
-                        .getElementById(
-                            "created-group-code"
-                        )
-                        .textContent;
-
-
-                const copied =
-                    await copyText(
-                        code
-                    );
-
-
-                if (
-                    copied
-                ) {
-
-                    showToast(
-                        "Código copiado."
-                    );
-
-                }
-
-            }
-
-        );
-
-
-
-    document
-        .getElementById(
-            "close-created-group"
-        )
-        .addEventListener(
-
-            "click",
-
-            function() {
-
-                groupCreatedModal.style.display =
-                    "none";
-
-            }
-
-        );
-
-
-
-    /* =========================================================
-       UNIRSE A UN GRUPO
-    ========================================================= */
-
-    document
-        .getElementById(
-            "join-group-button"
-        )
-        .addEventListener(
-
-            "click",
-
-            joinGroup
-
-        );
-
-
-
-    document
-        .getElementById(
-            "join-code"
-        )
-        .addEventListener(
-
-            "keydown",
-
-            function(event) {
-
-                if (
-                    event.key ===
-                    "Enter"
-                ) {
-
-                    event.preventDefault();
-
-
-                    joinGroup();
-
-                }
-
-            }
-
-        );
-
-
-
-    async function joinGroup() {
-
-        const codeInput =
-            document.getElementById(
-                "join-code"
-            );
-
-
-        const code =
-            codeInput
-                .value
-                .trim()
-                .toUpperCase();
-
-
-        if (
-            !code
-        ) {
-
-            showToast(
-                "Introduce el código del grupo."
-            );
-
-            return;
-
-        }
-
-
-        const button =
-            document.getElementById(
-                "join-group-button"
-            );
-
-
-        button.disabled =
-            true;
-
-
-        button.textContent =
-            "Uniéndose...";
-
-
-        try {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .rpc(
-
-                        "join_group",
-
-                        {
-
-                            p_join_code:
-                                code
-
-                        }
-
-                    );
-
-
-            if (
-                error
-            ) {
-
-                throw error;
-
-            }
-
-
-            const joinedGroupId =
-                data;
-
-
-            codeInput.value =
-                "";
-
-
-            groupMenu.style.display =
-                "none";
-
-
-            await loadGroups(
-                joinedGroupId
-            );
-
-
-            showToast(
-                "Te has unido al grupo correctamente."
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error uniéndose al grupo:",
-                error
-            );
-
-
-            showToast(
-                getFriendlyGroupError(
-                    error
-                )
-            );
-
-        }
-
-        finally {
-
-            button.disabled =
-                false;
-
-
-            button.textContent =
-                "Unirse";
-
-        }
-
-    }
-
-
-
-    /* =========================================================
-       PEGAR CÓDIGO
-    ========================================================= */
-
-    document
-        .getElementById(
-            "paste-code"
-        )
-        .addEventListener(
-
-            "click",
-
-            async function() {
-
-                try {
-
-                    const text =
-                        await navigator
-                            .clipboard
-                            .readText();
-
-
-                    document
-                        .getElementById(
-                            "join-code"
-                        )
-                        .value =
-                        text
-                            .trim()
-                            .toUpperCase();
-
-                }
-
-                catch (error) {
-
-                    showToast(
-                        "El navegador no ha permitido acceder al portapapeles."
-                    );
-
-                }
-
-            }
-
-        );
-
-
-
-    /* =========================================================
-       COPIAR TEXTO
-    ========================================================= */
-
-    async function copyText(text) {
-
-        try {
-
-            await navigator
-                .clipboard
-                .writeText(
-                    text
-                );
-
-
-            return true;
-
-        }
-
-        catch (error) {
-
-            /*
-            Método alternativo por si el navegador
-            no permite Clipboard API.
-            */
-
-            try {
-
-                const textarea =
-                    document.createElement(
-                        "textarea"
-                    );
-
-
-                textarea.value =
-                    text;
-
-
-                textarea.style.position =
-                    "fixed";
-
-
-                textarea.style.opacity =
-                    "0";
-
-
-                document.body.appendChild(
-                    textarea
-                );
-
-
-                textarea.select();
-
-
-                document.execCommand(
-                    "copy"
-                );
-
-
-                textarea.remove();
-
-
-                return true;
-
-            }
-
-            catch (fallbackError) {
 
                 showToast(
-                    "No se ha podido copiar el código."
+                    "Código copiado."
+                );
+            }
+
+            catch (error) {
+                console.warn(
+                    "No se pudo copiar:",
+                    error
                 );
 
-
-                return false;
-
+                showToast(
+                    "No se pudo copiar el código."
+                );
             }
 
         }
 
-    }
+
+        function showToast(message) {
+
+            toast.textContent =
+                message;
+
+            toast.style.display =
+                "block";
+
+            clearTimeout(toastTimer);
+
+            toastTimer =
+                setTimeout(
+                    function() {
+                        toast.style.display =
+                            "none";
+                    },
+                    2800
+                );
+
+        }
 
 
+        function showAuthMessage(element, message, type) {
 
-    /* =========================================================
-       MENSAJES DE ERROR DE GRUPOS
-    ========================================================= */
+            element.textContent =
+                message;
 
-    function getFriendlyGroupError(
-        error
-    ) {
+            element.className =
+                "auth-message " + type;
 
-        const message =
-            (
-                error &&
-                error.message
+        }
+
+
+        function clearAuthMessage(element) {
+
+            element.textContent =
+                "";
+
+            element.className =
+                "auth-message";
+
+        }
+
+
+        function setButtonLoading(button, isLoading, loadingText) {
+
+            if (!button) {
+                return;
+            }
+
+            if (isLoading) {
+                button.dataset.originalText =
+                    button.textContent.trim();
+
+                button.textContent =
+                    loadingText || "Cargando...";
+
+                button.disabled =
+                    true;
+            }
+
+            else {
+                if (button.dataset.originalText) {
+                    button.textContent =
+                        button.dataset.originalText;
+                }
+
+                button.disabled =
+                    false;
+            }
+
+        }
+
+
+        function getReadableSupabaseError(error) {
+
+            const message =
+                error && error.message
                     ? error.message
-                    : ""
-            );
-
-
-        const lower =
-            message.toLowerCase();
-
-
-        if (
-            lower.includes(
-                "ya perteneces"
-            )
-        ) {
-
-            return "Ya perteneces a ese grupo.";
-
-        }
-
-
-        if (
-            lower.includes(
-                "no existe"
-            )
-        ) {
-
-            return "El código introducido no corresponde a ningún grupo.";
-
-        }
-
-
-        if (
-            lower.includes(
-                "nombre"
-            )
-        ) {
-
-            return message;
-
-        }
-
-
-        if (
-            lower.includes(
-                "descripción"
-            )
-        ) {
-
-            return message;
-
-        }
-
-
-        return (
-            message ||
-            "Ha ocurrido un error con el grupo."
-        );
-
-    }
-
-
-
-    /* =========================================================
-       CERRAR MENÚS
-    ========================================================= */
-
-    document.addEventListener(
-
-        "click",
-
-        function() {
-
-            userMenu.style.display =
-                "none";
-
-
-            groupMenu.style.display =
-                "none";
-
-
-            layerMenu.style.display =
-                "none";
-
-        }
-
-    );
-
-
-
-    userMenu.addEventListener(
-
-        "click",
-
-        function(event) {
-
-            event.stopPropagation();
-
-        }
-
-    );
-
-
-
-    groupMenu.addEventListener(
-
-        "click",
-
-        function(event) {
-
-            event.stopPropagation();
-
-        }
-
-    );
-
-
-
-    createGroupModal.addEventListener(
-
-        "click",
-
-        function(event) {
+                    : "";
 
             if (
-                event.target ===
-                createGroupModal
+                message.includes("User already registered") ||
+                message.includes("already registered")
             ) {
-
-                createGroupModal.style.display =
-                    "none";
-
+                return "Ya existe una cuenta con ese correo.";
             }
-
-        }
-
-    );
-
-
-
-    groupCreatedModal.addEventListener(
-
-        "click",
-
-        function(event) {
 
             if (
-                event.target ===
-                groupCreatedModal
+                message.includes("Invalid login credentials")
             ) {
-
-                groupCreatedModal.style.display =
-                    "none";
-
+                return "Correo o contraseña incorrectos.";
             }
 
-        }
-
-    );
-
-
-
-    /* =========================================================
-       MENSAJES AUTENTICACIÓN
-    ========================================================= */
-
-    function showAuthMessage(
-        elementId,
-        message,
-        type
-    ) {
-
-        const element =
-            document.getElementById(
-                elementId
-            );
-
-
-        element.textContent =
-            message;
-
-
-        element.className =
-            "auth-message " +
-            type;
-
-    }
-
-
-
-    function clearAuthMessages() {
-
-        [
-            "login-message",
-            "register-message"
-        ]
-        .forEach(
-
-            function(id) {
-
-                const element =
-                    document.getElementById(
-                        id
-                    );
-
-
-                element.textContent =
-                    "";
-
-
-                element.className =
-                    "auth-message";
-
+            if (
+                message.includes("Password should be at least")
+            ) {
+                return "La contraseña debe tener al menos 8 caracteres.";
             }
 
-        );
+            if (
+                message.includes("El código del grupo no existe") ||
+                message.includes("Ya perteneces a este grupo") ||
+                message.includes("Introduce un código de grupo") ||
+                message.includes("El grupo debe tener un nombre") ||
+                message.includes("El nombre del grupo es demasiado largo") ||
+                message.includes("La descripción es demasiado larga") ||
+                message.includes("El vehículo debe tener un nombre") ||
+                message.includes("No perteneces a uno de los grupos seleccionados") ||
+                message.includes("No tienes acceso a este vehículo") ||
+                message.includes("Latitud incorrecta") ||
+                message.includes("Longitud incorrecta") ||
+                message.includes("El vehículo ya está aparcado") ||
+                message.includes("El vehículo no está aparcado") ||
+                message.includes("Debes iniciar sesión")
+            ) {
+                return message;
+            }
 
-    }
-
-
-
-    function translateAuthError(
-        message
-    ) {
-
-        const lower =
-            message.toLowerCase();
-
-
-        if (
-            lower.includes(
-                "already registered"
-            )
-        ) {
-
-            return "Ya existe una cuenta con ese correo.";
-
-        }
-
-
-        if (
-            lower.includes(
-                "password"
-            )
-        ) {
-
-            return "La contraseña no cumple los requisitos.";
+            return "La operación no se pudo completar.";
 
         }
 
-
-        if (
-            lower.includes(
-                "email"
-            )
-        ) {
-
-            return "Comprueba que el correo electrónico sea correcto.";
-
-        }
-
-
-        return message;
-
-    }
-
-
-
-    /* =========================================================
-       TOAST
-    ========================================================= */
-
-    let toastTimeout =
-        null;
-
-
-    function showToast(
-        message
-    ) {
-
-        const toast =
-            document.getElementById(
-                "toast"
-            );
-
-
-        toast.textContent =
-            message;
-
-
-        toast.style.display =
-            "block";
-
-
-        clearTimeout(
-            toastTimeout
-        );
-
-
-        toastTimeout =
-            setTimeout(
-
-                function() {
-
-                    toast.style.display =
-                        "none";
-
-                },
-
-                3000
-
-            );
-
-    }
-
-
-
-    /* =========================================================
-       INICIO
-    ========================================================= */
-
-    checkInitialSession();
+    })();
 
 </script>
-
 
 </body>
 
