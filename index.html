@@ -28,7 +28,7 @@
 
     <script>
         (function() {
-            const version = "2026-08-14-07";
+            const version = "2026-08-14-09";
 
             window.APP_PARKING_VERSION = version;
             window.APP_PARKING_RELOADING = false;
@@ -78,14 +78,14 @@
 
     <!-- MAPTILER -->
     <link
-        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-07"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-09"
         rel="stylesheet"
     >
 
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-07"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-09"></script>
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-07"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-09"></script>
 
 
     <style>
@@ -721,7 +721,11 @@
 
             height: 44px;
 
-            padding: 0 17px;
+            padding:
+                0
+                26px
+                0
+                17px;
 
             display: flex;
             align-items: center;
@@ -751,16 +755,18 @@
         }
 
         .group-chevron {
-            width: 9px;
-            height: 9px;
+            width: 13px;
+            height: 13px;
 
             flex-shrink: 0;
 
-            border-right: 2px solid #555555;
-            border-bottom: 2px solid #555555;
+            margin-right: 4px;
+
+            border-right: 3px solid #555555;
+            border-bottom: 3px solid #555555;
 
             transform:
-                translateY(-2px)
+                translateY(-3px)
                 rotate(45deg);
         }
 
@@ -1071,7 +1077,7 @@
         #layer-menu {
             position: absolute;
 
-            top: 0;
+            top: 51px;
             right: 50px;
 
             width: 170px;
@@ -1354,13 +1360,108 @@
 
         .vehicle-popup {
             width:
-                min(330px, calc(100vw - 72px));
+                min(286px, calc(100vw - 44px));
 
-            max-width: 360px;
+            max-width: 286px;
 
             color: #222222;
 
             font-family: Arial, sans-serif;
+        }
+
+        .vehicle-floating-popup {
+            position: absolute;
+
+            z-index: 62;
+
+            display: none;
+
+            padding: 12px;
+
+            background:
+                var(--ui-surface);
+
+            color:
+                var(--ui-text);
+
+            border:
+                1px solid
+                var(--ui-border);
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 5px 18px
+                var(--ui-shadow);
+        }
+
+        .vehicle-floating-popup::after {
+            content: "";
+
+            position: absolute;
+
+            left: 50%;
+            bottom: -8px;
+
+            width: 14px;
+            height: 14px;
+
+            background:
+                var(--ui-surface);
+
+            border-right:
+                1px solid
+                var(--ui-border);
+
+            border-bottom:
+                1px solid
+                var(--ui-border);
+
+            transform:
+                translateX(-50%)
+                rotate(45deg);
+        }
+
+        .vehicle-floating-popup.below-marker::after {
+            top: -8px;
+            bottom: auto;
+
+            border:
+                1px solid
+                var(--ui-border);
+
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .vehicle-popup-close {
+            position: absolute;
+
+            top: 5px;
+            right: 6px;
+
+            width: 24px;
+            height: 24px;
+
+            border: none;
+            border-radius: 7px;
+
+            background:
+                transparent;
+
+            color:
+                var(--ui-muted);
+
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .vehicle-popup-close:hover {
+            background:
+                var(--ui-button-hover);
+
+            color:
+                var(--ui-button-text);
         }
 
         .vehicle-map-popup .maplibregl-popup-content,
@@ -1373,7 +1474,11 @@
         }
 
         .vehicle-popup-title {
-            margin-bottom: 5px;
+            margin:
+                0
+                26px
+                5px
+                0;
 
             font-size: 16px;
             font-weight: bold;
@@ -1384,7 +1489,7 @@
 
             color: #555555;
 
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .vehicle-popup-line strong {
@@ -1404,9 +1509,9 @@
         .vehicle-unpark-button {
             width: 100%;
 
-            margin-top: 12px;
+            margin-top: 10px;
 
-            padding: 10px;
+            padding: 9px;
 
             border: none;
             border-radius: 8px;
@@ -1620,7 +1725,7 @@
             grid-template-columns:
                 42px
                 1fr
-                38px;
+                48px;
 
             gap: 12px;
 
@@ -1693,8 +1798,8 @@
         }
 
         .vehicle-delete-button {
-            width: 34px;
-            height: 34px;
+            width: 44px;
+            height: 44px;
 
             display: inline-flex;
             align-items: center;
@@ -1704,7 +1809,7 @@
                 1px solid
                 #ffd1d1;
 
-            border-radius: 9px;
+            border-radius: 11px;
 
             background: #fff5f5;
 
@@ -2541,6 +2646,8 @@
 
                 padding:
                     0
+                    22px
+                    0
                     14px;
             }
 
@@ -2561,6 +2668,10 @@
             .map-control {
                 width: 42px;
                 height: 42px;
+            }
+
+            #layer-menu {
+                top: 49px;
             }
 
             #group-button {
@@ -2875,6 +2986,14 @@
                     Cerrar sesión
                 </button>
 
+                <button
+                    id="delete-account-button"
+                    class="menu-button danger"
+                    type="button"
+                >
+                    Eliminar cuenta
+                </button>
+
             </div>
 
         </div>
@@ -2972,6 +3091,15 @@
         <div id="map-controls">
 
             <button
+                id="center-location-button"
+                class="map-control"
+                type="button"
+                aria-label="Centrar en mi ubicación"
+            >
+                <div class="location-arrow"></div>
+            </button>
+
+            <button
                 id="layer-button"
                 class="map-control"
                 type="button"
@@ -2982,15 +3110,6 @@
                     <span></span>
                     <span></span>
                 </div>
-            </button>
-
-            <button
-                id="center-location-button"
-                class="map-control"
-                type="button"
-                aria-label="Centrar en mi ubicación"
-            >
-                <div class="location-arrow"></div>
             </button>
 
             <div id="layer-menu">
@@ -3514,6 +3633,51 @@
 
 
 <!-- =========================================================
+     MODAL ELIMINAR CUENTA
+========================================================= -->
+
+<div
+    id="delete-account-modal"
+    class="modal-background"
+>
+
+    <div class="modal">
+
+        <h2>
+            Eliminar cuenta
+        </h2>
+
+        <p class="modal-text">
+            ¿Quieres eliminar esta cuenta? Se borrarán tus vehículos, tus datos de perfil y tu acceso a la app.
+        </p>
+
+        <div class="modal-buttons">
+
+            <button
+                id="cancel-delete-account"
+                class="secondary-button"
+                type="button"
+            >
+                Cancelar
+            </button>
+
+            <button
+                id="confirm-delete-account"
+                class="modal-delete-button"
+                type="button"
+            >
+                Eliminar cuenta
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
      MODAL ELIMINAR VEHICULO
 ========================================================= -->
 
@@ -3623,7 +3787,7 @@
 
         const APP_VERSION =
             window.APP_PARKING_VERSION ||
-            "2026-08-14-07";
+            "2026-08-14-09";
 
         const APP_VERSION_STORAGE_KEY =
             "app-parking-version";
@@ -3733,6 +3897,18 @@
 
         const logoutButton =
             document.getElementById("logout-button");
+
+        const deleteAccountButton =
+            document.getElementById("delete-account-button");
+
+        const deleteAccountModal =
+            document.getElementById("delete-account-modal");
+
+        const cancelDeleteAccountButton =
+            document.getElementById("cancel-delete-account");
+
+        const confirmDeleteAccountButton =
+            document.getElementById("confirm-delete-account");
 
         const groupButton =
             document.getElementById("group-button");
@@ -4659,6 +4835,98 @@
         }
 
 
+        function openDeleteAccountModal() {
+
+            userMenu.style.display =
+                "none";
+
+            groupMenu.style.display =
+                "none";
+
+            layerMenu.style.display =
+                "none";
+
+            deleteAccountModal.style.display =
+                "flex";
+
+        }
+
+
+        function closeDeleteAccountModal() {
+
+            deleteAccountModal.style.display =
+                "none";
+
+        }
+
+
+        async function deleteCurrentAccount() {
+
+            if (!supabaseClient || !currentUser) {
+                closeDeleteAccountModal();
+                showAuthScreen();
+                return;
+            }
+
+            setButtonLoading(
+                confirmDeleteAccountButton,
+                true,
+                "Eliminando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "delete_current_user"
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error eliminando cuenta:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                closeDeleteAccountModal();
+
+                await supabaseClient.auth.signOut();
+
+                showAuthScreen();
+
+                showAuthMessage(
+                    loginMessage,
+                    "Cuenta eliminada correctamente.",
+                    "success"
+                );
+            }
+
+            catch (error) {
+                showToast(
+                    getReadableSupabaseError(error)
+                );
+
+                console.error(
+                    "Error inesperado eliminando cuenta:",
+                    error
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    confirmDeleteAccountButton,
+                    false
+                );
+            }
+
+        }
+
+
         // =====================================================
         // GRUPOS
         // =====================================================
@@ -5362,6 +5630,10 @@
 
             if (deleteVehicleModal) {
                 deleteVehicleModal.style.display = "none";
+            }
+
+            if (deleteAccountModal) {
+                deleteAccountModal.style.display = "none";
             }
 
             editingVehicleId = null;
@@ -6917,34 +7189,143 @@
             const content =
                 createVehiclePopupContent(vehicle);
 
+            const popup =
+                document.createElement("div");
+
+            popup.className =
+                "vehicle-floating-popup";
+
+            popup.style.visibility =
+                "hidden";
+
+            popup.style.display =
+                "block";
+
+            const closeButton =
+                document.createElement("button");
+
+            closeButton.type =
+                "button";
+
+            closeButton.className =
+                "vehicle-popup-close";
+
+            closeButton.setAttribute(
+                "aria-label",
+                "Cerrar"
+            );
+
+            closeButton.textContent =
+                "×";
+
+            closeButton.addEventListener(
+                "click",
+                function(event) {
+                    event.stopPropagation();
+                    closeVehiclePopup();
+                }
+            );
+
+            popup.appendChild(closeButton);
+            popup.appendChild(content);
+
+            app.appendChild(popup);
+
             vehicleInfoPopup =
-                new maptilersdk.Popup({
-                    className:
-                        "vehicle-map-popup",
-                    maxWidth:
-                        "370px",
-                    offset:
-                        26
-                })
-                    .setLngLat([
-                        vehicle.longitude,
-                        vehicle.latitude
-                    ])
-                    .setDOMContent(content)
-                    .addTo(map);
+                popup;
 
             openVehiclePopupId =
                 vehicle.id;
 
-            vehicleInfoPopup.on(
-                "close",
+            requestAnimationFrame(
                 function() {
-                    vehicleInfoPopup = null;
-                    openVehiclePopupId = null;
+                    positionVehiclePopup(
+                        popup,
+                        vehicle
+                    );
+
+                    popup.style.visibility =
+                        "visible";
                 }
             );
 
             refreshElapsedDisplays();
+
+        }
+
+
+        function positionVehiclePopup(popup, vehicle) {
+
+            if (!map || !popup || !vehicle) {
+                return;
+            }
+
+            const point =
+                map.project([
+                    vehicle.longitude,
+                    vehicle.latitude
+                ]);
+
+            const appRect =
+                app.getBoundingClientRect();
+
+            const popupWidth =
+                popup.offsetWidth;
+
+            const popupHeight =
+                popup.offsetHeight;
+
+            const margin =
+                12;
+
+            let left =
+                point.x - popupWidth / 2;
+
+            let top =
+                point.y - popupHeight - 22;
+
+            let belowMarker =
+                false;
+
+            if (top < margin) {
+                top =
+                    point.y + 22;
+
+                belowMarker =
+                    true;
+            }
+
+            left =
+                Math.max(
+                    margin,
+                    Math.min(
+                        left,
+                        appRect.width - popupWidth - margin
+                    )
+                );
+
+            top =
+                Math.max(
+                    margin,
+                    Math.min(
+                        top,
+                        appRect.height - popupHeight - margin
+                    )
+                );
+
+            popup.classList.toggle(
+                "below-marker",
+                belowMarker
+            );
+
+            popup.style.left =
+                left + "px";
+
+            popup.style.top =
+                top + "px";
+
+            popup.style.display =
+                "block";
 
         }
 
@@ -7540,6 +7921,21 @@
                 handleLogout
             );
 
+            deleteAccountButton.addEventListener(
+                "click",
+                openDeleteAccountModal
+            );
+
+            cancelDeleteAccountButton.addEventListener(
+                "click",
+                closeDeleteAccountModal
+            );
+
+            confirmDeleteAccountButton.addEventListener(
+                "click",
+                deleteCurrentAccount
+            );
+
             groupButton.addEventListener(
                 "click",
                 function(event) {
@@ -7829,6 +8225,15 @@
                 }
             );
 
+            deleteAccountModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === deleteAccountModal) {
+                        closeDeleteAccountModal();
+                    }
+                }
+            );
+
             vehiclesModal.addEventListener(
                 "click",
                 function(event) {
@@ -8024,6 +8429,13 @@
                 message.includes("Password should be at least")
             ) {
                 return "La contraseña debe tener al menos 8 caracteres.";
+            }
+
+            if (
+                message.includes("delete_current_user") ||
+                message.includes("Could not find the function")
+            ) {
+                return "Falta activar la función segura para eliminar cuentas en Supabase.";
             }
 
             if (
