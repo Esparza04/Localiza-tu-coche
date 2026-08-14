@@ -274,9 +274,11 @@
 
         .primary-button:disabled,
         .modal-create-button:disabled,
+        .modal-delete-button:disabled,
         #join-group-button:disabled,
         .bottom-action-button:disabled,
-        .vehicle-unpark-button:disabled {
+        .vehicle-unpark-button:disabled,
+        .vehicle-delete-button:disabled {
             opacity: 0.6;
             cursor: default;
         }
@@ -1021,7 +1023,7 @@
             font-weight: bold;
         }
 
-        #open-create-vehicle {
+        #open-vehicles-panel {
             background: #eeeeee;
 
             color: #333333;
@@ -1062,6 +1064,10 @@
 
         .vehicle-marker-icon.dot {
             border-radius: 50%;
+        }
+
+        .vehicle-marker-icon.square {
+            border-radius: 6px;
         }
 
         .vehicle-marker-icon.car {
@@ -1343,6 +1349,14 @@
             margin-bottom: 13px;
         }
 
+        .vehicles-manager-modal {
+            max-width: 480px;
+        }
+
+        .vehicles-manager-modal .modal-buttons {
+            justify-content: space-between;
+        }
+
         .vehicles-filter-row label {
             display: block;
 
@@ -1372,7 +1386,8 @@
 
             grid-template-columns:
                 42px
-                1fr;
+                1fr
+                38px;
 
             gap: 12px;
 
@@ -1385,11 +1400,29 @@
             border-radius: 11px;
 
             background: #ffffff;
+
+            cursor: pointer;
+        }
+
+        .vehicle-list-item:hover {
+            border-color: #2388e8;
+
+            background: #f5faff;
+        }
+
+        .vehicle-list-item.not-owned {
+            cursor: default;
+        }
+
+        .vehicle-list-details {
+            min-width: 0;
         }
 
         .vehicle-list-name {
             font-size: 15px;
             font-weight: bold;
+
+            overflow-wrap: anywhere;
         }
 
         .vehicle-list-meta {
@@ -1399,6 +1432,117 @@
 
             font-size: 12px;
             line-height: 1.35;
+        }
+
+        .vehicle-list-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .vehicle-owner-badge {
+            display: inline-flex;
+            align-items: center;
+
+            margin-top: 8px;
+
+            padding:
+                5px
+                8px;
+
+            border-radius: 999px;
+
+            color: #555555;
+
+            background: #f0f0f0;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .vehicle-delete-button {
+            width: 34px;
+            height: 34px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px solid
+                #ffd1d1;
+
+            border-radius: 9px;
+
+            background: #fff5f5;
+
+            color: #c62828;
+
+            cursor: pointer;
+        }
+
+        .vehicle-delete-button:hover {
+            border-color: #c62828;
+
+            background: #ffecec;
+        }
+
+        .trash-icon {
+            position: relative;
+
+            width: 14px;
+            height: 16px;
+
+            border:
+                2px solid
+                currentColor;
+
+            border-top: none;
+
+            border-radius:
+                0
+                0
+                3px
+                3px;
+        }
+
+        .trash-icon::before {
+            content: "";
+
+            position: absolute;
+
+            left: -3px;
+            top: -5px;
+
+            width: 18px;
+            height: 2px;
+
+            border-radius: 2px;
+
+            background: currentColor;
+        }
+
+        .trash-icon::after {
+            content: "";
+
+            position: absolute;
+
+            left: 4px;
+            top: -9px;
+
+            width: 6px;
+            height: 4px;
+
+            border:
+                2px solid
+                currentColor;
+
+            border-bottom: none;
+
+            border-radius:
+                3px
+                3px
+                0
+                0;
         }
 
         .vehicle-status {
@@ -1631,6 +1775,21 @@
             border-radius: 9px;
 
             background: #2388e8;
+
+            color: white;
+
+            font-weight: bold;
+        }
+
+        .modal-delete-button {
+            padding:
+                11px
+                18px;
+
+            border: none;
+            border-radius: 9px;
+
+            background: #c62828;
 
             color: white;
 
@@ -2045,15 +2204,6 @@
                 P
             </button>
 
-            <button
-                id="open-vehicles-panel"
-                class="square-button"
-                type="button"
-                aria-label="Ver vehículos"
-            >
-                <span class="car-button-icon"></span>
-            </button>
-
             <div id="user-menu">
 
                 <div id="user-info">
@@ -2224,11 +2374,11 @@
     <div id="bottom-actions">
 
         <button
-            id="open-create-vehicle"
+            id="open-vehicles-panel"
             class="bottom-action-button"
             type="button"
         >
-            Añadir vehículo
+            Gestionar vehículos
         </button>
 
         <button
@@ -2422,10 +2572,10 @@
     class="modal-background"
 >
 
-    <div class="modal">
+    <div class="modal vehicles-manager-modal">
 
         <h2>
-            Vehículos
+            Gestionar vehículos
         </h2>
 
         <div class="vehicles-filter-row">
@@ -2447,6 +2597,14 @@
         ></div>
 
         <div class="modal-buttons">
+
+            <button
+                id="add-vehicle-from-manager"
+                class="secondary-button"
+                type="button"
+            >
+                Añadir vehículo
+            </button>
 
             <button
                 id="close-vehicles-panel"
@@ -2475,7 +2633,7 @@
 
     <div class="modal">
 
-        <h2>
+        <h2 id="vehicle-form-title">
             Crear vehículo
         </h2>
 
@@ -2536,6 +2694,10 @@
                 >
                     <option value="dot">
                         Círculo
+                    </option>
+
+                    <option value="square">
+                        Cuadrado
                     </option>
 
                     <option value="car">
@@ -2632,6 +2794,51 @@
 
 
 <!-- =========================================================
+     MODAL ELIMINAR VEHICULO
+========================================================= -->
+
+<div
+    id="delete-vehicle-modal"
+    class="modal-background"
+>
+
+    <div class="modal">
+
+        <h2>
+            Eliminar vehículo
+        </h2>
+
+        <p class="modal-text">
+            ¿Quieres eliminar este vehículo?
+        </p>
+
+        <div class="modal-buttons">
+
+            <button
+                id="cancel-delete-vehicle"
+                class="secondary-button"
+                type="button"
+            >
+                Cancelar
+            </button>
+
+            <button
+                id="confirm-delete-vehicle"
+                class="modal-delete-button"
+                type="button"
+            >
+                Eliminar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
      MODAL APARCAR VEHICULO
 ========================================================= -->
 
@@ -2696,7 +2903,7 @@
 
         const APP_VERSION =
             window.APP_PARKING_VERSION ||
-            "2026-08-14-05";
+            "2026-08-14-06";
 
         const APP_VERSION_STORAGE_KEY =
             "app-parking-version";
@@ -2729,6 +2936,8 @@
         let elapsedRefreshTimer = null;
         let vehicleInfoPopup = null;
         let openVehiclePopupId = null;
+        let editingVehicleId = null;
+        let pendingDeleteVehicleId = null;
 
         let parkingSelectionVehicleId = null;
 
@@ -2868,14 +3077,17 @@
         const closeVehiclesPanelButton =
             document.getElementById("close-vehicles-panel");
 
-        const openCreateVehicleButton =
-            document.getElementById("open-create-vehicle");
+        const addVehicleFromManagerButton =
+            document.getElementById("add-vehicle-from-manager");
 
         const openParkVehicleButton =
             document.getElementById("open-park-vehicle");
 
         const createVehicleModal =
             document.getElementById("create-vehicle-modal");
+
+        const vehicleFormTitle =
+            document.getElementById("vehicle-form-title");
 
         const vehicleNameInput =
             document.getElementById("vehicle-name");
@@ -2903,6 +3115,15 @@
 
         const createVehicleConfirmButton =
             document.getElementById("create-vehicle-confirm");
+
+        const deleteVehicleModal =
+            document.getElementById("delete-vehicle-modal");
+
+        const cancelDeleteVehicleButton =
+            document.getElementById("cancel-delete-vehicle");
+
+        const confirmDeleteVehicleButton =
+            document.getElementById("confirm-delete-vehicle");
 
         const parkVehicleModal =
             document.getElementById("park-vehicle-modal");
@@ -4116,7 +4337,7 @@
         function normalizeVehicle(vehicle) {
 
             const markerType =
-                ["dot", "car"].includes(
+                ["dot", "square", "car"].includes(
                     vehicle.marker_type
                 )
                     ? vehicle.marker_type
@@ -4266,6 +4487,13 @@
             if (vehiclesModal) {
                 vehiclesModal.style.display = "none";
             }
+
+            if (deleteVehicleModal) {
+                deleteVehicleModal.style.display = "none";
+            }
+
+            editingVehicleId = null;
+            pendingDeleteVehicleId = null;
 
         }
 
@@ -4552,17 +4780,40 @@
 
         function createVehiclesPanelItem(vehicle) {
 
+            const canManageVehicle =
+                isVehicleOwnedByCurrentUser(vehicle);
+
             const item =
                 document.createElement("div");
 
             item.className =
-                "vehicle-list-item";
+                canManageVehicle
+                    ? "vehicle-list-item"
+                    : "vehicle-list-item not-owned";
+
+            item.tabIndex =
+                0;
+
+            item.setAttribute(
+                "role",
+                "button"
+            );
+
+            item.setAttribute(
+                "aria-label",
+                canManageVehicle
+                    ? "Editar " + vehicle.name
+                    : vehicle.name + " compartido"
+            );
 
             const markerPreview =
                 createVehicleMarkerElement(vehicle);
 
             const details =
                 document.createElement("div");
+
+            details.className =
+                "vehicle-list-details";
 
             const name =
                 document.createElement("div");
@@ -4600,8 +4851,87 @@
             details.appendChild(meta);
             details.appendChild(status);
 
+            if (!canManageVehicle) {
+                const ownerBadge =
+                    document.createElement("div");
+
+                ownerBadge.className =
+                    "vehicle-owner-badge";
+
+                ownerBadge.textContent =
+                    "Compartido";
+
+                details.appendChild(ownerBadge);
+            }
+
+            const actions =
+                document.createElement("div");
+
+            actions.className =
+                "vehicle-list-actions";
+
+            if (canManageVehicle) {
+                const deleteButton =
+                    document.createElement("button");
+
+                deleteButton.type =
+                    "button";
+
+                deleteButton.className =
+                    "vehicle-delete-button";
+
+                deleteButton.setAttribute(
+                    "aria-label",
+                    "Eliminar " + vehicle.name
+                );
+
+                const trashIcon =
+                    document.createElement("span");
+
+                trashIcon.className =
+                    "trash-icon";
+
+                trashIcon.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+                deleteButton.appendChild(trashIcon);
+
+                deleteButton.addEventListener(
+                    "click",
+                    function(event) {
+                        event.stopPropagation();
+                        openDeleteVehicleModal(vehicle.id);
+                    }
+                );
+
+                actions.appendChild(deleteButton);
+            }
+
+            item.addEventListener(
+                "click",
+                function() {
+                    openEditVehicleModal(vehicle.id);
+                }
+            );
+
+            item.addEventListener(
+                "keydown",
+                function(event) {
+                    if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                    ) {
+                        event.preventDefault();
+                        openEditVehicleModal(vehicle.id);
+                    }
+                }
+            );
+
             item.appendChild(markerPreview);
             item.appendChild(details);
+            item.appendChild(actions);
 
             return item;
 
@@ -4664,6 +4994,20 @@
         }
 
 
+        function isVehicleOwnedByCurrentUser(vehicle) {
+
+            if (!vehicle || !currentUser) {
+                return false;
+            }
+
+            return (
+                vehicle.is_owner ||
+                vehicle.owner_id === currentUser.id
+            );
+
+        }
+
+
         function getVehiclesPanelFilterName() {
 
             const selectedOption =
@@ -4681,9 +5025,18 @@
 
         function openCreateVehicleModal() {
 
+            editingVehicleId =
+                null;
+
             userMenu.style.display = "none";
             groupMenu.style.display = "none";
             layerMenu.style.display = "none";
+
+            vehicleFormTitle.textContent =
+                "Crear vehículo";
+
+            createVehicleConfirmButton.textContent =
+                "Crear";
 
             vehicleNameInput.value =
                 "";
@@ -4721,10 +5074,83 @@
             createVehicleModal.style.display =
                 "none";
 
+            editingVehicleId =
+                null;
+
         }
 
 
-        function renderVehicleGroupList() {
+        function openEditVehicleModal(vehicleId) {
+
+            const vehicle =
+                getVehicleById(vehicleId);
+
+            if (!vehicle) {
+                showToast(
+                    "No se encontró el vehículo."
+                );
+
+                return;
+            }
+
+            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+                showToast(
+                    "Solo el propietario puede editar este vehículo."
+                );
+
+                return;
+            }
+
+            editingVehicleId =
+                vehicle.id;
+
+            userMenu.style.display = "none";
+            groupMenu.style.display = "none";
+            layerMenu.style.display = "none";
+
+            vehicleFormTitle.textContent =
+                "Editar vehículo";
+
+            createVehicleConfirmButton.textContent =
+                "Guardar";
+
+            vehicleNameInput.value =
+                vehicle.name || "";
+
+            vehicleDescriptionInput.value =
+                vehicle.description || "";
+
+            vehiclePlateInput.value =
+                vehicle.plate || "";
+
+            vehicleMarkerTypeSelect.value =
+                vehicle.marker_type || "dot";
+
+            vehicleMarkerColorInput.value =
+                normalizeMarkerColor(vehicle.marker_color);
+
+            renderVehicleGroupList(vehicle.group_ids);
+            updateVehicleMarkerPreview();
+
+            createVehicleModal.style.display =
+                "flex";
+
+            setTimeout(
+                function() {
+                    vehicleNameInput.focus();
+                },
+                50
+            );
+
+        }
+
+
+        function renderVehicleGroupList(selectedGroupIds) {
+
+            const selectedIds =
+                Array.isArray(selectedGroupIds)
+                    ? selectedGroupIds
+                    : [];
 
             vehicleGroupList.innerHTML =
                 "";
@@ -4761,6 +5187,9 @@
 
                     checkbox.value =
                         group.id;
+
+                    checkbox.checked =
+                        selectedIds.includes(group.id);
 
                     const name =
                         document.createElement("span");
@@ -4824,6 +5253,214 @@
                         return input.value;
                     }
                 );
+
+        }
+
+
+        async function saveVehicle() {
+
+            if (editingVehicleId) {
+                await updateVehicle();
+                return;
+            }
+
+            await createVehicle();
+
+        }
+
+
+        async function updateVehicle() {
+
+            const vehicle =
+                getVehicleById(editingVehicleId);
+
+            if (!vehicle) {
+                showToast(
+                    "No se encontró el vehículo."
+                );
+
+                return;
+            }
+
+            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+                showToast(
+                    "Solo el propietario puede editar este vehículo."
+                );
+
+                return;
+            }
+
+            const vehicleName =
+                vehicleNameInput.value.trim();
+
+            const vehicleDescription =
+                vehicleDescriptionInput.value.trim();
+
+            const vehiclePlate =
+                vehiclePlateInput.value.trim();
+
+            const markerType =
+                vehicleMarkerTypeSelect.value || "dot";
+
+            const markerColor =
+                normalizeMarkerColor(
+                    vehicleMarkerColorInput.value
+                );
+
+            const selectedGroupIds =
+                getSelectedVehicleGroupIds();
+
+            if (!vehicleName) {
+                showToast(
+                    "Introduce un nombre de vehículo."
+                );
+
+                vehicleNameInput.focus();
+
+                return;
+            }
+
+            setButtonLoading(
+                createVehicleConfirmButton,
+                true,
+                "Guardando..."
+            );
+
+            try {
+                const vehicleResult =
+                    await supabaseClient
+                        .from("vehicles")
+                        .update({
+                            name:
+                                vehicleName,
+
+                            description:
+                                vehicleDescription || null,
+
+                            plate:
+                                vehiclePlate || null,
+
+                            marker_type:
+                                markerType,
+
+                            marker_color:
+                                markerColor
+                        })
+                        .eq("id", vehicle.id)
+                        .eq("owner_id", currentUser.id)
+                        .select("id")
+                        .maybeSingle();
+
+                if (vehicleResult.error) {
+                    showToast(
+                        getReadableSupabaseError(vehicleResult.error)
+                    );
+
+                    console.error(
+                        "Error editando vehículo:",
+                        vehicleResult.error
+                    );
+
+                    return;
+                }
+
+                if (!vehicleResult.data) {
+                    showToast(
+                        "No se pudo guardar. Solo el propietario puede modificar el vehículo."
+                    );
+
+                    return;
+                }
+
+                const currentGroupIds =
+                    Array.isArray(vehicle.group_ids)
+                        ? vehicle.group_ids
+                        : [];
+
+                const groupsToRemove =
+                    currentGroupIds.filter(
+                        function(groupId) {
+                            return !selectedGroupIds.includes(groupId);
+                        }
+                    );
+
+                const groupsToAdd =
+                    selectedGroupIds.filter(
+                        function(groupId) {
+                            return !currentGroupIds.includes(groupId);
+                        }
+                    );
+
+                if (groupsToRemove.length > 0) {
+                    const removeResult =
+                        await supabaseClient
+                            .from("vehicle_groups")
+                            .delete()
+                            .eq("vehicle_id", vehicle.id)
+                            .in("group_id", groupsToRemove);
+
+                    if (removeResult.error) {
+                        showToast(
+                            getReadableSupabaseError(removeResult.error)
+                        );
+
+                        console.error(
+                            "Error quitando grupos del vehículo:",
+                            removeResult.error
+                        );
+
+                        return;
+                    }
+                }
+
+                if (groupsToAdd.length > 0) {
+                    const rows =
+                        groupsToAdd.map(
+                            function(groupId) {
+                                return {
+                                    vehicle_id:
+                                        vehicle.id,
+
+                                    group_id:
+                                        groupId
+                                };
+                            }
+                        );
+
+                    const addResult =
+                        await supabaseClient
+                            .from("vehicle_groups")
+                            .insert(rows);
+
+                    if (addResult.error) {
+                        showToast(
+                            getReadableSupabaseError(addResult.error)
+                        );
+
+                        console.error(
+                            "Error añadiendo grupos al vehículo:",
+                            addResult.error
+                        );
+
+                        return;
+                    }
+                }
+
+                closeCreateVehicleModal();
+
+                await loadVehicles(true);
+
+                showToast(
+                    "Vehículo guardado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    createVehicleConfirmButton,
+                    false
+                );
+            }
 
         }
 
@@ -4916,6 +5553,132 @@
             finally {
                 setButtonLoading(
                     createVehicleConfirmButton,
+                    false
+                );
+            }
+
+        }
+
+
+        function openDeleteVehicleModal(vehicleId) {
+
+            const vehicle =
+                getVehicleById(vehicleId);
+
+            if (!vehicle) {
+                showToast(
+                    "No se encontró el vehículo."
+                );
+
+                return;
+            }
+
+            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+                showToast(
+                    "Solo el propietario puede eliminar este vehículo."
+                );
+
+                return;
+            }
+
+            pendingDeleteVehicleId =
+                vehicle.id;
+
+            deleteVehicleModal.style.display =
+                "flex";
+
+        }
+
+
+        function closeDeleteVehicleModal() {
+
+            deleteVehicleModal.style.display =
+                "none";
+
+            pendingDeleteVehicleId =
+                null;
+
+        }
+
+
+        async function deleteVehicle() {
+
+            const vehicle =
+                getVehicleById(pendingDeleteVehicleId);
+
+            if (!vehicle) {
+                closeDeleteVehicleModal();
+
+                showToast(
+                    "No se encontró el vehículo."
+                );
+
+                return;
+            }
+
+            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+                closeDeleteVehicleModal();
+
+                showToast(
+                    "Solo el propietario puede eliminar este vehículo."
+                );
+
+                return;
+            }
+
+            setButtonLoading(
+                confirmDeleteVehicleButton,
+                true,
+                "Eliminando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient
+                        .from("vehicles")
+                        .delete()
+                        .eq("id", vehicle.id)
+                        .eq("owner_id", currentUser.id)
+                        .select("id")
+                        .maybeSingle();
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error eliminando vehículo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                if (!result.data) {
+                    showToast(
+                        "No se pudo eliminar. Solo el propietario puede borrar el vehículo."
+                    );
+
+                    return;
+                }
+
+                closeDeleteVehicleModal();
+
+                if (editingVehicleId === vehicle.id) {
+                    closeCreateVehicleModal();
+                }
+
+                await loadVehicles(true);
+
+                showToast(
+                    "Vehículo eliminado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    confirmDeleteVehicleButton,
                     false
                 );
             }
@@ -6002,7 +6765,7 @@
                 renderVehiclesPanelList
             );
 
-            openCreateVehicleButton.addEventListener(
+            addVehicleFromManagerButton.addEventListener(
                 "click",
                 openCreateVehicleModal
             );
@@ -6014,7 +6777,7 @@
 
             createVehicleConfirmButton.addEventListener(
                 "click",
-                createVehicle
+                saveVehicle
             );
 
             vehicleNameInput.addEventListener(
@@ -6022,7 +6785,7 @@
                 function(event) {
                     if (event.key === "Enter") {
                         event.preventDefault();
-                        createVehicle();
+                        saveVehicle();
                     }
                 }
             );
@@ -6035,6 +6798,16 @@
             vehicleMarkerColorInput.addEventListener(
                 "input",
                 updateVehicleMarkerPreview
+            );
+
+            cancelDeleteVehicleButton.addEventListener(
+                "click",
+                closeDeleteVehicleModal
+            );
+
+            confirmDeleteVehicleButton.addEventListener(
+                "click",
+                deleteVehicle
             );
 
             openParkVehicleButton.addEventListener(
@@ -6132,6 +6905,15 @@
                 function(event) {
                     if (event.target === parkVehicleModal) {
                         closeParkVehicleModal();
+                    }
+                }
+            );
+
+            deleteVehicleModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === deleteVehicleModal) {
+                        closeDeleteVehicleModal();
                     }
                 }
             );
