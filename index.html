@@ -28,7 +28,7 @@
 
     <script>
         (function() {
-            const version = "2026-08-14-10";
+            const version = "2026-08-14-11";
 
             window.APP_PARKING_VERSION = version;
             window.APP_PARKING_RELOADING = false;
@@ -78,14 +78,14 @@
 
     <!-- MAPTILER -->
     <link
-        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-10"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-11"
         rel="stylesheet"
     >
 
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-10"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-11"></script>
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-11"></script>
 
 
     <style>
@@ -1372,7 +1372,7 @@
         .vehicle-floating-popup {
             position: absolute;
 
-            z-index: 62;
+            z-index: 91;
 
             display: none;
 
@@ -1393,6 +1393,21 @@
             box-shadow:
                 0 5px 18px
                 var(--ui-shadow);
+        }
+
+        .vehicle-popup-backdrop {
+            position: absolute;
+
+            inset: 0;
+
+            z-index: 90;
+
+            background:
+                transparent;
+
+            cursor: default;
+
+            touch-action: none;
         }
 
         .vehicle-floating-popup::after {
@@ -3823,7 +3838,7 @@
 
         const APP_VERSION =
             window.APP_PARKING_VERSION ||
-            "2026-08-14-10";
+            "2026-08-14-11";
 
         const APP_VERSION_STORAGE_KEY =
             "app-parking-version";
@@ -3858,6 +3873,7 @@
         let vehicleRefreshTimer = null;
         let elapsedRefreshTimer = null;
         let vehicleInfoPopup = null;
+        let vehiclePopupBackdrop = null;
         let openVehiclePopupId = null;
         let editingVehicleId = null;
         let pendingDeleteVehicleId = null;
@@ -7260,6 +7276,33 @@
             const content =
                 createVehiclePopupContent(vehicle);
 
+            const backdrop =
+                document.createElement("div");
+
+            backdrop.className =
+                "vehicle-popup-backdrop";
+
+            backdrop.addEventListener(
+                "pointerdown",
+                function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    closeVehiclePopup();
+                }
+            );
+
+            backdrop.addEventListener(
+                "wheel",
+                function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                },
+                {
+                    passive:
+                        false
+                }
+            );
+
             const popup =
                 document.createElement("div");
 
@@ -7271,6 +7314,20 @@
 
             popup.style.display =
                 "block";
+
+            popup.addEventListener(
+                "pointerdown",
+                function(event) {
+                    event.stopPropagation();
+                }
+            );
+
+            popup.addEventListener(
+                "click",
+                function(event) {
+                    event.stopPropagation();
+                }
+            );
 
             const closeButton =
                 document.createElement("button");
@@ -7300,7 +7357,11 @@
             popup.appendChild(closeButton);
             popup.appendChild(content);
 
+            app.appendChild(backdrop);
             app.appendChild(popup);
+
+            vehiclePopupBackdrop =
+                backdrop;
 
             vehicleInfoPopup =
                 popup;
@@ -7541,9 +7602,16 @@
 
         function closeVehiclePopup() {
 
+            if (vehiclePopupBackdrop) {
+                vehiclePopupBackdrop.remove();
+            }
+
             if (vehicleInfoPopup) {
                 vehicleInfoPopup.remove();
             }
+
+            vehiclePopupBackdrop =
+                null;
 
             vehicleInfoPopup =
                 null;
