@@ -28,10 +28,28 @@
 
     <script>
         (function() {
-            const version = "2026-08-14-05";
+            const version = "2026-08-14-07";
 
             window.APP_PARKING_VERSION = version;
             window.APP_PARKING_RELOADING = false;
+
+            try {
+                const savedTheme =
+                    localStorage.getItem("app-parking-theme");
+
+                const theme =
+                    savedTheme === "dark"
+                        ? "dark"
+                        : "light";
+
+                document.documentElement.dataset.theme =
+                    theme;
+            }
+
+            catch (error) {
+                document.documentElement.dataset.theme =
+                    "light";
+            }
 
             if (
                 location.protocol !== "http:" &&
@@ -60,14 +78,14 @@
 
     <!-- MAPTILER -->
     <link
-        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-05"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-07"
         rel="stylesheet"
     >
 
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-05"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-07"></script>
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-05"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-07"></script>
 
 
     <style>
@@ -97,6 +115,70 @@
 
         button {
             cursor: pointer;
+        }
+
+        :root {
+            --ui-bg: #f5f6f8;
+            --ui-auth-bg-start: #eef6ff;
+            --ui-auth-bg-end: #ffffff;
+            --ui-surface: #ffffff;
+            --ui-surface-translucent: rgba(255,255,255,0.96);
+            --ui-surface-soft: #f6f7f9;
+            --ui-surface-subtle: #fbfbfb;
+            --ui-button-bg: #eeeeee;
+            --ui-button-hover: #e2e2e2;
+            --ui-button-text: #222222;
+            --ui-text: #222222;
+            --ui-muted: #666666;
+            --ui-soft-muted: #777777;
+            --ui-border: #d8d8d8;
+            --ui-border-strong: #e2e2e2;
+            --ui-shadow: rgba(0,0,0,0.25);
+            --ui-primary: #2388e8;
+            --ui-primary-soft: #eaf4ff;
+            --ui-primary-text: #1769aa;
+            --ui-success: #1f6f3f;
+            --ui-success-soft: #e5f6ea;
+            --ui-danger: #c62828;
+            --ui-danger-soft: #fff5f5;
+            --ui-danger-border: #ffd1d1;
+            --vehicle-marker-border: #ffffff;
+            --vehicle-wheel: #20242a;
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+
+            --ui-bg: #111318;
+            --ui-auth-bg-start: #101217;
+            --ui-auth-bg-end: #1a1d24;
+            --ui-surface: #181b21;
+            --ui-surface-translucent: rgba(24,27,33,0.96);
+            --ui-surface-soft: #222630;
+            --ui-surface-subtle: #20232b;
+            --ui-button-bg: #3a3f49;
+            --ui-button-hover: #4a505c;
+            --ui-button-text: #f5f7fa;
+            --ui-text: #f4f6fa;
+            --ui-muted: #c4cad5;
+            --ui-soft-muted: #aeb6c3;
+            --ui-border: #3e4551;
+            --ui-border-strong: #505865;
+            --ui-shadow: rgba(0,0,0,0.48);
+            --ui-primary: #58a9ff;
+            --ui-primary-soft: #20354d;
+            --ui-primary-text: #d9ecff;
+            --ui-success: #8ee6a6;
+            --ui-success-soft: #193323;
+            --ui-danger: #ff8585;
+            --ui-danger-soft: #392020;
+            --ui-danger-border: #743131;
+            --vehicle-marker-border: #f5f7fa;
+            --vehicle-wheel: #111318;
+        }
+
+        html[data-theme="light"] {
+            color-scheme: light;
         }
 
 
@@ -393,6 +475,8 @@
         #user-area {
             position: relative;
 
+            z-index: 80;
+
             display: flex;
             flex-direction: column;
 
@@ -425,8 +509,10 @@
         #user-menu {
             position: absolute;
 
-            top: 0;
+            top: 51px;
             left: 52px;
+
+            z-index: 300;
 
             width: 230px;
 
@@ -441,6 +527,70 @@
             box-shadow:
                 0 3px 14px
                 rgba(0, 0, 0, 0.25);
+        }
+
+        .settings-icon {
+            position: relative;
+
+            width: 22px;
+            height: 18px;
+
+            display: block;
+        }
+
+        .settings-icon span {
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            height: 2px;
+
+            border-radius: 999px;
+
+            background: currentColor;
+        }
+
+        .settings-icon span:nth-child(1) {
+            top: 2px;
+        }
+
+        .settings-icon span:nth-child(2) {
+            top: 8px;
+        }
+
+        .settings-icon span:nth-child(3) {
+            top: 14px;
+        }
+
+        .settings-icon span::after {
+            content: "";
+
+            position: absolute;
+
+            top: 50%;
+
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: currentColor;
+
+            transform:
+                translateY(-50%);
+        }
+
+        .settings-icon span:nth-child(1)::after {
+            left: 4px;
+        }
+
+        .settings-icon span:nth-child(2)::after {
+            right: 3px;
+        }
+
+        .settings-icon span:nth-child(3)::after {
+            left: 10px;
         }
 
         .car-button-icon {
@@ -557,6 +707,8 @@
         #group-area {
             position: relative;
 
+            z-index: 40;
+
             flex: 1;
 
             display: flex;
@@ -616,6 +768,8 @@
             position: absolute;
 
             top: 52px;
+
+            z-index: 40;
 
             width: 310px;
 
@@ -1034,8 +1188,8 @@
         }
 
         .vehicle-marker {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
 
             display: flex;
             align-items: center;
@@ -1047,12 +1201,12 @@
         .vehicle-marker-icon {
             position: relative;
 
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
 
             border:
-                3px solid
-                white;
+                2px solid
+                var(--vehicle-marker-border);
 
             background:
                 var(--vehicle-color, #2388e8);
@@ -1067,18 +1221,73 @@
         }
 
         .vehicle-marker-icon.square {
-            border-radius: 6px;
+            border-radius: 5px;
+        }
+
+        .vehicle-marker-icon.triangle {
+            width: 28px;
+            height: 28px;
+
+            border: none;
+
+            background: transparent;
+
+            box-shadow: none;
+
+            filter:
+                drop-shadow(0 2px 7px rgba(0,0,0,0.34));
+        }
+
+        .vehicle-marker-icon.triangle::before,
+        .vehicle-marker-icon.triangle::after {
+            content: "";
+
+            position: absolute;
+
+            clip-path:
+                polygon(
+                    50% 5%,
+                    94% 90%,
+                    6% 90%
+                );
+        }
+
+        .vehicle-marker-icon.triangle::before {
+            inset: 0;
+
+            background:
+                var(--vehicle-marker-border);
+        }
+
+        .vehicle-marker-icon.triangle::after {
+            inset: 4px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(255,255,255,0.28),
+                    rgba(255,255,255,0)
+                ),
+                var(--vehicle-color, #2388e8);
         }
 
         .vehicle-marker-icon.car {
-            width: 34px;
-            height: 22px;
+            width: 30px;
+            height: 20px;
 
             border-radius:
-                9px
-                9px
+                8px
+                8px
                 6px
                 6px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(255,255,255,0.32),
+                    rgba(255,255,255,0) 44%
+                ),
+                var(--vehicle-color, #2388e8);
         }
 
         .vehicle-marker-icon.car::before {
@@ -1087,14 +1296,14 @@
             position: absolute;
 
             top: -7px;
-            left: 7px;
+            left: 6px;
 
-            width: 14px;
-            height: 9px;
+            width: 15px;
+            height: 10px;
 
             border:
-                3px solid
-                white;
+                2px solid
+                var(--vehicle-marker-border);
 
             border-bottom: none;
 
@@ -1105,6 +1314,18 @@
                 0;
 
             background:
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0) 45%,
+                    rgba(255,255,255,0.72) 45%,
+                    rgba(255,255,255,0.72) 55%,
+                    rgba(255,255,255,0) 55%
+                ),
+                linear-gradient(
+                    180deg,
+                    rgba(255,255,255,0.55),
+                    rgba(255,255,255,0.16)
+                ),
                 var(--vehicle-color, #2388e8);
         }
 
@@ -1113,30 +1334,42 @@
 
             position: absolute;
 
-            left: 5px;
-            bottom: -6px;
+            left: 4px;
+            bottom: -5px;
 
             width: 6px;
             height: 6px;
 
             border-radius: 50%;
 
-            background: #222222;
+            background:
+                var(--vehicle-wheel);
 
             box-shadow:
-                17px
+                16px
                 0
                 0
-                #222222;
+                var(--vehicle-wheel);
         }
 
         .vehicle-popup {
-            min-width: 260px;
-            max-width: 310px;
+            width:
+                min(330px, calc(100vw - 72px));
+
+            max-width: 360px;
 
             color: #222222;
 
             font-family: Arial, sans-serif;
+        }
+
+        .vehicle-map-popup .maplibregl-popup-content,
+        .vehicle-map-popup .mapboxgl-popup-content {
+            width:
+                min(370px, calc(100vw - 48px));
+
+            max-width:
+                min(370px, calc(100vw - 48px));
         }
 
         .vehicle-popup-title {
@@ -1890,6 +2123,410 @@
         }
 
 
+        /* =====================================================
+           TEMAS
+        ===================================================== */
+
+        body {
+            background:
+                var(--ui-bg);
+
+            color:
+                var(--ui-text);
+        }
+
+        #loading-screen {
+            background:
+                var(--ui-bg);
+        }
+
+        #auth-screen {
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--ui-auth-bg-start),
+                    var(--ui-auth-bg-end)
+                );
+        }
+
+        .auth-card,
+        #user-menu,
+        #group-menu,
+        #layer-menu,
+        .modal,
+        .park-vehicle-option,
+        .vehicle-list-item,
+        .join-code-box {
+            background:
+                var(--ui-surface);
+
+            color:
+                var(--ui-text);
+
+            border-color:
+                var(--ui-border);
+        }
+
+        .auth-card,
+        #user-menu,
+        #group-menu,
+        #layer-menu,
+        .square-button,
+        .map-control,
+        #group-button,
+        #bottom-actions,
+        .parking-picker,
+        .modal {
+            box-shadow:
+                0 3px 14px
+                var(--ui-shadow);
+        }
+
+        .square-button,
+        .map-control,
+        #group-button,
+        .secondary-button,
+        #paste-code,
+        #open-vehicles-panel,
+        #open-park-vehicle,
+        .primary-button,
+        #join-group-button,
+        .modal-create-button,
+        #copy-created-code {
+            background:
+                var(--ui-button-bg);
+
+            color:
+                var(--ui-button-text);
+        }
+
+        .square-button:hover,
+        .map-control:hover,
+        #group-button:hover,
+        .secondary-button:hover,
+        #paste-code:hover,
+        #open-vehicles-panel:hover,
+        #open-park-vehicle:hover,
+        .primary-button:hover,
+        #join-group-button:hover,
+        .modal-create-button:hover,
+        #copy-created-code:hover {
+            background:
+                var(--ui-button-hover);
+        }
+
+        #bottom-actions,
+        .parking-picker {
+            background:
+                var(--ui-surface-translucent);
+        }
+
+        .form-group label,
+        .vehicles-filter-row label,
+        #user-name,
+        .vehicle-list-name,
+        .park-vehicle-name,
+        .parking-picker-title,
+        .modal h2,
+        .vehicle-popup-title,
+        #created-group-code {
+            color:
+                var(--ui-text);
+        }
+
+        .auth-subtitle,
+        .auth-change,
+        #user-email,
+        .join-title,
+        .group-role,
+        .group-code-row,
+        .modal-note,
+        .vehicle-empty-state,
+        .park-vehicle-meta,
+        .vehicle-list-meta,
+        .parking-picker-coords,
+        .modal-text,
+        .vehicle-popup-line {
+            color:
+                var(--ui-muted);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        #join-code,
+        .select-input,
+        .color-input {
+            background:
+                var(--ui-surface);
+
+            color:
+                var(--ui-text);
+
+            border-color:
+                var(--ui-border);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder,
+        #join-code::placeholder {
+            color:
+                var(--ui-soft-muted);
+        }
+
+        .vehicle-group-list {
+            background:
+                var(--ui-surface-subtle);
+
+            border-color:
+                var(--ui-border);
+        }
+
+        #user-info,
+        .menu-separator,
+        .vehicle-popup-time {
+            border-color:
+                var(--ui-border);
+        }
+
+        .menu-separator {
+            background:
+                var(--ui-border);
+        }
+
+        .menu-button,
+        .group-option,
+        .layer-option {
+            color:
+                var(--ui-text);
+        }
+
+        .menu-button:hover,
+        .group-option:hover,
+        .layer-option:hover,
+        .vehicle-group-choice:hover {
+            background:
+                var(--ui-button-hover);
+        }
+
+        .group-option.active,
+        .park-vehicle-option:hover,
+        .vehicle-list-item:hover {
+            background:
+                var(--ui-primary-soft);
+
+            color:
+                var(--ui-primary-text);
+
+            border-color:
+                var(--ui-primary);
+        }
+
+        .copy-group-code {
+            background:
+                var(--ui-primary-soft);
+
+            color:
+                var(--ui-primary-text);
+        }
+
+        .group-chevron {
+            border-color:
+                var(--ui-button-text);
+        }
+
+        .layers-icon span {
+            background:
+                var(--ui-button-bg);
+
+            border-color:
+                var(--ui-primary);
+        }
+
+        .location-arrow {
+            border-bottom-color:
+                var(--ui-primary);
+        }
+
+        .vehicle-owner-badge,
+        .vehicle-status.unparked {
+            background:
+                var(--ui-button-bg);
+
+            color:
+                var(--ui-muted);
+        }
+
+        .vehicle-status.parked {
+            background:
+                var(--ui-success-soft);
+
+            color:
+                var(--ui-success);
+        }
+
+        .vehicle-delete-button {
+            background:
+                var(--ui-danger-soft);
+
+            border-color:
+                var(--ui-danger-border);
+
+            color:
+                var(--ui-danger);
+        }
+
+        .vehicle-delete-button:hover {
+            background:
+                var(--ui-danger-soft);
+
+            border-color:
+                var(--ui-danger);
+        }
+
+        .modal-delete-button,
+        .vehicle-unpark-button {
+            background:
+                var(--ui-danger);
+
+            color:
+                #ffffff;
+        }
+
+        .auth-message.error {
+            color:
+                var(--ui-danger);
+
+            background:
+                var(--ui-danger-soft);
+        }
+
+        .auth-message.success {
+            color:
+                var(--ui-success);
+
+            background:
+                var(--ui-success-soft);
+        }
+
+        .vehicle-popup {
+            color:
+                var(--ui-text);
+        }
+
+        .vehicle-popup-line strong {
+            color:
+                var(--ui-text);
+        }
+
+        .vehicle-map-popup .maplibregl-popup-content,
+        .vehicle-map-popup .mapboxgl-popup-content {
+            background:
+                var(--ui-surface);
+
+            color:
+                var(--ui-text);
+
+            box-shadow:
+                0 4px 18px
+                var(--ui-shadow);
+        }
+
+        .vehicle-map-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+        .vehicle-map-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+        .vehicle-map-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+            border-bottom-color:
+                var(--ui-surface);
+        }
+
+        .vehicle-map-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+        .vehicle-map-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+        .vehicle-map-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+            border-top-color:
+                var(--ui-surface);
+        }
+
+        .vehicle-map-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+            border-right-color:
+                var(--ui-surface);
+        }
+
+        .vehicle-map-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip,
+        .vehicle-map-popup.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+            border-left-color:
+                var(--ui-surface);
+        }
+
+        .vehicle-map-popup .maplibregl-popup-close-button,
+        .vehicle-map-popup .mapboxgl-popup-close-button {
+            color:
+                var(--ui-text);
+        }
+
+        .theme-selector {
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                1fr;
+
+            gap: 6px;
+
+            padding: 5px;
+
+            border:
+                1px solid
+                var(--ui-border);
+
+            border-radius: 12px;
+
+            background:
+                var(--ui-surface-soft);
+        }
+
+        .theme-option {
+            min-height: 40px;
+
+            border: none;
+            border-radius: 8px;
+
+            background:
+                transparent;
+
+            color:
+                var(--ui-muted);
+
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .theme-option:hover {
+            background:
+                var(--ui-button-hover);
+
+            color:
+                var(--ui-button-text);
+        }
+
+        .theme-option.active {
+            background:
+                var(--ui-button-bg);
+
+            color:
+                var(--ui-button-text);
+
+            box-shadow:
+                0 1px 4px
+                var(--ui-shadow);
+        }
+
+
         @media (max-width: 500px) {
 
             #top-interface {
@@ -1918,6 +2555,7 @@
 
             #user-menu {
                 left: 50px;
+                top: 49px;
             }
 
             .map-control {
@@ -2196,6 +2834,19 @@
         <div id="user-area">
 
             <button
+                id="settings-button"
+                class="square-button"
+                type="button"
+                aria-label="Ajustes"
+            >
+                <span class="settings-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+
+            <button
                 id="user-button"
                 class="square-button"
                 type="button"
@@ -2429,6 +3080,71 @@
                 type="button"
             >
                 Confirmar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     MODAL AJUSTES
+========================================================= -->
+
+<div
+    id="settings-modal"
+    class="modal-background"
+>
+
+    <div class="modal settings-modal">
+
+        <h2>
+            Ajustes
+        </h2>
+
+        <div class="form-group">
+
+            <label>
+                Tema
+            </label>
+
+            <div
+                class="theme-selector"
+                role="group"
+                aria-label="Tema de la interfaz"
+            >
+
+                <button
+                    class="theme-option active"
+                    type="button"
+                    data-theme-choice="light"
+                >
+                    Claro
+                </button>
+
+                <button
+                    class="theme-option"
+                    type="button"
+                    data-theme-choice="dark"
+                >
+                    Oscuro
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="modal-buttons">
+
+            <button
+                id="close-settings-modal"
+                class="secondary-button"
+                type="button"
+            >
+                Cerrar
             </button>
 
         </div>
@@ -2700,6 +3416,10 @@
                         Cuadrado
                     </option>
 
+                    <option value="triangle">
+                        Tri&aacute;ngulo
+                    </option>
+
                     <option value="car">
                         Coche
                     </option>
@@ -2903,10 +3623,13 @@
 
         const APP_VERSION =
             window.APP_PARKING_VERSION ||
-            "2026-08-14-06";
+            "2026-08-14-07";
 
         const APP_VERSION_STORAGE_KEY =
             "app-parking-version";
+
+        const THEME_STORAGE_KEY =
+            "app-parking-theme";
 
         const MAPTILER_API_KEY =
             "lJBAab5ODxqdFUoXLLm8";
@@ -2986,6 +3709,18 @@
 
         const userButton =
             document.getElementById("user-button");
+
+        const settingsButton =
+            document.getElementById("settings-button");
+
+        const settingsModal =
+            document.getElementById("settings-modal");
+
+        const closeSettingsModalButton =
+            document.getElementById("close-settings-modal");
+
+        const themeChoiceButtons =
+            document.querySelectorAll("[data-theme-choice]");
 
         const userMenu =
             document.getElementById("user-menu");
@@ -3164,6 +3899,10 @@
 
             await maintainApplicationCache();
 
+            applyTheme(
+                getStoredThemePreference()
+            );
+
             attachInterfaceEvents();
 
             if (!initializeSupabase()) {
@@ -3322,6 +4061,139 @@
                 currentPath.includes("parking") ||
                 currentPath.includes("localiza-tu-coche")
             );
+
+        }
+
+
+        function getStoredThemePreference() {
+
+            try {
+                const storedTheme =
+                    localStorage.getItem(
+                        THEME_STORAGE_KEY
+                    );
+
+                if (
+                    storedTheme === "light" ||
+                    storedTheme === "dark"
+                ) {
+                    return storedTheme;
+                }
+            }
+
+            catch (error) {
+                console.warn(
+                    "No se pudo leer el tema guardado:",
+                    error
+                );
+            }
+
+            return "light";
+
+        }
+
+
+        function applyTheme(theme) {
+
+            const normalizedTheme =
+                theme === "dark"
+                    ? "dark"
+                    : "light";
+
+            document.documentElement.dataset.theme =
+                normalizedTheme;
+
+            syncThemeControls(
+                normalizedTheme
+            );
+
+        }
+
+
+        function saveThemePreference(theme) {
+
+            try {
+                localStorage.setItem(
+                    THEME_STORAGE_KEY,
+                    theme
+                );
+            }
+
+            catch (error) {
+                console.warn(
+                    "No se pudo guardar el tema:",
+                    error
+                );
+            }
+
+        }
+
+
+        function chooseTheme(theme) {
+
+            const normalizedTheme =
+                theme === "dark"
+                    ? "dark"
+                    : "light";
+
+            applyTheme(
+                normalizedTheme
+            );
+
+            saveThemePreference(
+                normalizedTheme
+            );
+
+        }
+
+
+        function syncThemeControls(theme) {
+
+            themeChoiceButtons.forEach(
+                function(button) {
+                    const isActive =
+                        button.dataset.themeChoice === theme;
+
+                    button.classList.toggle(
+                        "active",
+                        isActive
+                    );
+
+                    button.setAttribute(
+                        "aria-pressed",
+                        isActive ? "true" : "false"
+                    );
+                }
+            );
+
+        }
+
+
+        function openSettingsModal() {
+
+            userMenu.style.display =
+                "none";
+
+            groupMenu.style.display =
+                "none";
+
+            layerMenu.style.display =
+                "none";
+
+            syncThemeControls(
+                getStoredThemePreference()
+            );
+
+            settingsModal.style.display =
+                "flex";
+
+        }
+
+
+        function closeSettingsModal() {
+
+            settingsModal.style.display =
+                "none";
 
         }
 
@@ -4337,7 +5209,7 @@
         function normalizeVehicle(vehicle) {
 
             const markerType =
-                ["dot", "square", "car"].includes(
+                ["dot", "square", "triangle", "car"].includes(
                     vehicle.marker_type
                 )
                     ? vehicle.marker_type
@@ -6047,6 +6919,10 @@
 
             vehicleInfoPopup =
                 new maptilersdk.Popup({
+                    className:
+                        "vehicle-map-popup",
+                    maxWidth:
+                        "370px",
                     offset:
                         26
                 })
@@ -6623,6 +7499,32 @@
                 handleRegister
             );
 
+            settingsButton.addEventListener(
+                "click",
+                function(event) {
+                    event.stopPropagation();
+                    openSettingsModal();
+                }
+            );
+
+            closeSettingsModalButton.addEventListener(
+                "click",
+                closeSettingsModal
+            );
+
+            themeChoiceButtons.forEach(
+                function(button) {
+                    button.addEventListener(
+                        "click",
+                        function() {
+                            chooseTheme(
+                                button.dataset.themeChoice
+                            );
+                        }
+                    );
+                }
+            );
+
             userButton.addEventListener(
                 "click",
                 function(event) {
@@ -6870,6 +7772,15 @@
                         layerMenu.style.display = "none";
                     }
 
+                }
+            );
+
+            settingsModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === settingsModal) {
+                        closeSettingsModal();
+                    }
                 }
             );
 
