@@ -28,7 +28,7 @@
 
     <script>
         (function() {
-            const version = "2026-08-14-11";
+            const version = "2026-08-15-02";
 
             window.APP_PARKING_VERSION = version;
             window.APP_PARKING_RELOADING = false;
@@ -78,14 +78,14 @@
 
     <!-- MAPTILER -->
     <link
-        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-14-11"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-15-02"
         rel="stylesheet"
     >
 
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-14-11"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-15-02"></script>
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-14-11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-15-02"></script>
 
 
     <style>
@@ -334,6 +334,106 @@
         .form-group input:focus,
         .form-group textarea:focus {
             border-color: #2388e8;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-field input {
+            padding-right: 48px;
+        }
+
+        .password-toggle {
+            position: absolute;
+
+            top: 50%;
+            right: 8px;
+
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: none;
+            border-radius: 9px;
+
+            background:
+                transparent;
+
+            color:
+                #555555;
+
+            transform:
+                translateY(-50%);
+        }
+
+        .password-toggle:hover {
+            background:
+                #eeeeee;
+        }
+
+        .eye-icon {
+            position: relative;
+
+            width: 22px;
+            height: 14px;
+
+            border:
+                2px solid
+                currentColor;
+
+            border-radius:
+                14px
+                14px
+                14px
+                14px /
+                10px
+                10px
+                10px
+                10px;
+        }
+
+        .eye-icon::before {
+            content: "";
+
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background:
+                currentColor;
+
+            transform:
+                translate(-50%, -50%);
+        }
+
+        .password-toggle.is-visible .eye-icon::after {
+            content: "";
+
+            position: absolute;
+
+            left: -4px;
+            top: 50%;
+
+            width: 30px;
+            height: 2px;
+
+            border-radius: 999px;
+
+            background:
+                currentColor;
+
+            transform:
+                rotate(-35deg);
         }
 
         .primary-button {
@@ -1109,6 +1209,14 @@
             background: #eeeeee;
         }
 
+        .layer-option.active {
+            background: #eaf4ff;
+
+            color: #1769aa;
+
+            font-weight: bold;
+        }
+
 
         /* =====================================================
            PUNTO AZUL
@@ -1360,9 +1468,9 @@
 
         .vehicle-popup {
             width:
-                min(286px, calc(100vw - 44px));
+                min(312px, calc(100vw - 44px));
 
-            max-width: 286px;
+            max-width: 312px;
 
             color: #222222;
 
@@ -1415,7 +1523,8 @@
 
             position: absolute;
 
-            left: 50%;
+            left:
+                var(--popup-arrow-left, 50%);
             bottom: -8px;
 
             width: 14px;
@@ -2422,6 +2531,19 @@
                 var(--ui-border);
         }
 
+        .password-toggle {
+            color:
+                var(--ui-muted);
+        }
+
+        .password-toggle:hover {
+            background:
+                var(--ui-button-hover);
+
+            color:
+                var(--ui-button-text);
+        }
+
         .form-group input::placeholder,
         .form-group textarea::placeholder,
         #join-code::placeholder {
@@ -2465,6 +2587,7 @@
         }
 
         .group-option.active,
+        .layer-option.active,
         .park-vehicle-option:hover,
         .vehicle-list-item:hover {
             background:
@@ -2823,12 +2946,26 @@
                     Contraseña
                 </label>
 
-                <input
-                    id="login-password"
-                    type="password"
-                    autocomplete="current-password"
-                    required
-                >
+                <div class="password-field">
+
+                    <input
+                        id="login-password"
+                        type="password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        class="password-toggle"
+                        type="button"
+                        data-password-target="login-password"
+                        aria-label="Mostrar contraseña"
+                        aria-pressed="false"
+                    >
+                        <span class="eye-icon"></span>
+                    </button>
+
+                </div>
 
             </div>
 
@@ -2922,13 +3059,27 @@
                     Contraseña
                 </label>
 
-                <input
-                    id="register-password"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                >
+                <div class="password-field">
+
+                    <input
+                        id="register-password"
+                        type="password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+
+                    <button
+                        class="password-toggle"
+                        type="button"
+                        data-password-target="register-password"
+                        aria-label="Mostrar contraseña"
+                        aria-pressed="false"
+                    >
+                        <span class="eye-icon"></span>
+                    </button>
+
+                </div>
 
             </div>
 
@@ -2939,13 +3090,27 @@
                     Repetir contraseña
                 </label>
 
-                <input
-                    id="register-password-repeat"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                >
+                <div class="password-field">
+
+                    <input
+                        id="register-password-repeat"
+                        type="password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+
+                    <button
+                        class="password-toggle"
+                        type="button"
+                        data-password-target="register-password-repeat"
+                        aria-label="Mostrar contraseña"
+                        aria-pressed="false"
+                    >
+                        <span class="eye-icon"></span>
+                    </button>
+
+                </div>
 
             </div>
 
@@ -3200,14 +3365,6 @@
             type="button"
         >
             Gestionar vehículos
-        </button>
-
-        <button
-            id="open-park-vehicle"
-            class="bottom-action-button"
-            type="button"
-        >
-            Aparcar
         </button>
 
     </div>
@@ -3789,7 +3946,7 @@
         </h2>
 
         <p class="modal-note">
-            Elige un vehículo y después mueve el mapa hasta dejar el marcador justo encima del sitio.
+            Elige el vehículo que quieres aparcar en el punto que has marcado.
         </p>
 
         <div
@@ -3838,13 +3995,16 @@
 
         const APP_VERSION =
             window.APP_PARKING_VERSION ||
-            "2026-08-14-11";
+            "2026-08-15-02";
 
         const APP_VERSION_STORAGE_KEY =
             "app-parking-version";
 
         const THEME_STORAGE_KEY =
             "app-parking-theme";
+
+        const MAP_STYLE_STORAGE_KEY =
+            "app-parking-map-style";
 
         const MAPTILER_API_KEY =
             "lJBAab5ODxqdFUoXLLm8";
@@ -3877,6 +4037,7 @@
         let openVehiclePopupId = null;
         let editingVehicleId = null;
         let pendingDeleteVehicleId = null;
+        let pendingParkingLocation = null;
 
         let parkingSelectionVehicleId = null;
 
@@ -3922,6 +4083,9 @@
 
         const showLoginButton =
             document.getElementById("show-login");
+
+        const passwordToggleButtons =
+            document.querySelectorAll("[data-password-target]");
 
         const userButton =
             document.getElementById("user-button");
@@ -4393,6 +4557,89 @@
                     );
                 }
             );
+
+        }
+
+
+        function getStoredMapStylePreference() {
+
+            try {
+                const storedStyle =
+                    localStorage.getItem(
+                        MAP_STYLE_STORAGE_KEY
+                    );
+
+                if (
+                    storedStyle === "streets" ||
+                    storedStyle === "satellite" ||
+                    storedStyle === "hybrid"
+                ) {
+                    return storedStyle;
+                }
+            }
+
+            catch (error) {
+                console.warn(
+                    "No se pudo leer la capa guardada:",
+                    error
+                );
+            }
+
+            return "streets";
+
+        }
+
+
+        function saveMapStylePreference(styleId) {
+
+            try {
+                localStorage.setItem(
+                    MAP_STYLE_STORAGE_KEY,
+                    styleId
+                );
+            }
+
+            catch (error) {
+                console.warn(
+                    "No se pudo guardar la capa:",
+                    error
+                );
+            }
+
+        }
+
+
+        function getMapStyle(styleId) {
+
+            if (!window.maptilersdk) {
+                return null;
+            }
+
+            if (styleId === "satellite") {
+                return maptilersdk.MapStyle.SATELLITE;
+            }
+
+            if (styleId === "hybrid") {
+                return maptilersdk.MapStyle.HYBRID;
+            }
+
+            return maptilersdk.MapStyle.STREETS;
+
+        }
+
+
+        function syncLayerOptions(styleId) {
+
+            document
+                .querySelectorAll(".layer-option")
+                .forEach(
+                    function(option) {
+                        option.classList.toggle(
+                            "active",
+                            option.dataset.style === styleId
+                        );
+                    }
+                );
 
         }
 
@@ -6917,11 +7164,15 @@
         }
 
 
-        async function openParkVehicleModal() {
+        async function openParkVehicleModal(location) {
 
             userMenu.style.display = "none";
             groupMenu.style.display = "none";
             layerMenu.style.display = "none";
+            closeVehiclePopup();
+
+            pendingParkingLocation =
+                location || null;
 
             setButtonLoading(
                 openParkVehicleButton,
@@ -6952,6 +7203,9 @@
 
             parkVehicleModal.style.display =
                 "none";
+
+            pendingParkingLocation =
+                null;
 
         }
 
@@ -7052,8 +7306,9 @@
                     option.addEventListener(
                         "click",
                         function() {
-                            startParkingSelection(
-                                vehicle.id
+                            parkVehicleAtPendingLocation(
+                                vehicle.id,
+                                option
                             );
                         }
                     );
@@ -7062,6 +7317,76 @@
 
                 }
             );
+
+        }
+
+
+        async function parkVehicleAtPendingLocation(vehicleId, button) {
+
+            const vehicle =
+                getVehicleById(vehicleId);
+
+            if (!vehicle || !pendingParkingLocation) {
+                closeParkVehicleModal();
+
+                showToast(
+                    "Toca un punto del mapa para aparcar."
+                );
+
+                return;
+            }
+
+            setButtonLoading(
+                button,
+                true,
+                "Aparcando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "park_vehicle",
+                        {
+                            p_vehicle_id:
+                                vehicle.id,
+
+                            p_latitude:
+                                pendingParkingLocation.latitude,
+
+                            p_longitude:
+                                pendingParkingLocation.longitude
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error aparcando vehículo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                closeParkVehicleModal();
+
+                await loadVehicles(true);
+
+                showToast(
+                    "Vehículo aparcado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    button,
+                    false
+                );
+            }
+
 
         }
 
@@ -7450,6 +7775,20 @@
                 belowMarker
             );
 
+            const arrowLeft =
+                Math.max(
+                    18,
+                    Math.min(
+                        point.x - left,
+                        popupWidth - 18
+                    )
+                );
+
+            popup.style.setProperty(
+                "--popup-arrow-left",
+                arrowLeft + "px"
+            );
+
             popup.style.left =
                 left + "px";
 
@@ -7770,15 +8109,16 @@
             maptilersdk.config.apiKey =
                 MAPTILER_API_KEY;
 
+            const initialMapStyle =
+                getStoredMapStylePreference();
+
             map =
                 new maptilersdk.Map({
 
                     container: "map",
 
                     style:
-                        maptilersdk
-                            .MapStyle
-                            .STREETS,
+                        getMapStyle(initialMapStyle),
 
                     center: [
                         -3.7038,
@@ -7792,6 +8132,58 @@
                     geolocateControl: false
 
                 });
+
+            syncLayerOptions(
+                initialMapStyle
+            );
+
+            map.on(
+                "click",
+                handleMapParkingClick
+            );
+
+        }
+
+
+        function handleMapParkingClick(event) {
+
+            if (
+                userMenu.style.display === "block" ||
+                groupMenu.style.display === "block" ||
+                layerMenu.style.display === "block"
+            ) {
+                userMenu.style.display =
+                    "none";
+
+                groupMenu.style.display =
+                    "none";
+
+                layerMenu.style.display =
+                    "none";
+
+                return;
+            }
+
+            if (
+                !event ||
+                !event.lngLat ||
+                parkVehicleModal.style.display === "flex" ||
+                vehiclesModal.style.display === "flex" ||
+                createVehicleModal.style.display === "flex" ||
+                deleteVehicleModal.style.display === "flex" ||
+                deleteAccountModal.style.display === "flex" ||
+                settingsModal.style.display === "flex"
+            ) {
+                return;
+            }
+
+            openParkVehicleModal({
+                latitude:
+                    event.lngLat.lat,
+
+                longitude:
+                    event.lngLat.lng
+            });
 
         }
 
@@ -7969,23 +8361,25 @@
                 return;
             }
 
-            if (styleId === "streets") {
-                map.setStyle(
-                    maptilersdk.MapStyle.STREETS
-                );
-            }
+            const normalizedStyle =
+                (
+                    styleId === "satellite" ||
+                    styleId === "hybrid"
+                )
+                    ? styleId
+                    : "streets";
 
-            if (styleId === "satellite") {
-                map.setStyle(
-                    maptilersdk.MapStyle.SATELLITE
-                );
-            }
+            map.setStyle(
+                getMapStyle(normalizedStyle)
+            );
 
-            if (styleId === "hybrid") {
-                map.setStyle(
-                    maptilersdk.MapStyle.HYBRID
-                );
-            }
+            saveMapStylePreference(
+                normalizedStyle
+            );
+
+            syncLayerOptions(
+                normalizedStyle
+            );
 
             layerMenu.style.display =
                 "none";
@@ -8017,6 +8411,17 @@
             registerForm.addEventListener(
                 "submit",
                 handleRegister
+            );
+
+            passwordToggleButtons.forEach(
+                function(button) {
+                    button.addEventListener(
+                        "click",
+                        function() {
+                            togglePasswordVisibility(button);
+                        }
+                    );
+                }
             );
 
             settingsButton.addEventListener(
@@ -8247,10 +8652,14 @@
                 deleteVehicle
             );
 
-            openParkVehicleButton.addEventListener(
-                "click",
-                openParkVehicleModal
-            );
+            if (openParkVehicleButton) {
+                openParkVehicleButton.addEventListener(
+                    "click",
+                    function() {
+                        openParkVehicleModal(null);
+                    }
+                );
+            }
 
             cancelParkVehicleButton.addEventListener(
                 "click",
@@ -8400,6 +8809,46 @@
                 menu.style.display =
                     "block";
             }
+
+        }
+
+
+        function togglePasswordVisibility(button) {
+
+            const targetId =
+                button.dataset.passwordTarget;
+
+            const input =
+                document.getElementById(targetId);
+
+            if (!input) {
+                return;
+            }
+
+            const shouldShow =
+                input.type === "password";
+
+            input.type =
+                shouldShow
+                    ? "text"
+                    : "password";
+
+            button.classList.toggle(
+                "is-visible",
+                shouldShow
+            );
+
+            button.setAttribute(
+                "aria-pressed",
+                shouldShow ? "true" : "false"
+            );
+
+            button.setAttribute(
+                "aria-label",
+                shouldShow
+                    ? "Ocultar contraseña"
+                    : "Mostrar contraseña"
+            );
 
         }
 
