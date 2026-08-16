@@ -28,7 +28,7 @@
 
     <script>
         (function() {
-            const version = "2026-08-15-02";
+            const version = "2026-08-16-01";
 
             window.APP_PARKING_VERSION = version;
             window.APP_PARKING_RELOADING = false;
@@ -78,14 +78,14 @@
 
     <!-- MAPTILER -->
     <link
-        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-15-02"
+        href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css?app_version=2026-08-16-01"
         rel="stylesheet"
     >
 
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-15-02"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js?app_version=2026-08-16-01"></script>
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-15-02"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?app_version=2026-08-16-01"></script>
 
 
     <style>
@@ -874,10 +874,11 @@
             position: absolute;
 
             top: 52px;
+            left: 50%;
 
             z-index: 40;
 
-            width: 310px;
+            width: 370px;
 
             max-width:
                 calc(100vw - 30px);
@@ -894,6 +895,9 @@
             background: white;
 
             border-radius: 14px;
+
+            transform:
+                translateX(-50%);
 
             box-shadow:
                 0 3px 15px
@@ -913,6 +917,8 @@
             text-align: left;
 
             font-size: 15px;
+
+            cursor: pointer;
         }
 
         .group-option:hover {
@@ -940,6 +946,17 @@
             gap: 8px;
         }
 
+        .group-title {
+            flex: 1;
+
+            min-width: 0;
+
+            display: flex;
+            align-items: baseline;
+
+            gap: 6px;
+        }
+
         .group-name-text {
             min-width: 0;
 
@@ -955,6 +972,102 @@
 
             font-size: 11px;
             font-weight: normal;
+        }
+
+        .group-actions {
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+
+            gap: 6px;
+        }
+
+        .group-action-button {
+            width: 32px;
+            height: 32px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px solid
+                #dddddd;
+
+            border-radius: 9px;
+
+            background: #f3f3f3;
+
+            color: #444444;
+
+            cursor: pointer;
+        }
+
+        .group-action-button:hover {
+            background: #e7e7e7;
+        }
+
+        .group-action-button.delete {
+            border-color: #ffd1d1;
+
+            background: #fff5f5;
+
+            color: #c62828;
+        }
+
+        .pencil-icon {
+            position: relative;
+
+            width: 16px;
+            height: 16px;
+
+            display: block;
+
+            transform: rotate(-45deg);
+        }
+
+        .pencil-icon::before {
+            content: "";
+
+            position: absolute;
+
+            left: 5px;
+            top: 1px;
+
+            width: 6px;
+            height: 12px;
+
+            border:
+                2px solid
+                currentColor;
+
+            border-radius: 2px;
+        }
+
+        .pencil-icon::after {
+            content: "";
+
+            position: absolute;
+
+            left: 5px;
+            top: 13px;
+
+            width: 0;
+            height: 0;
+
+            border-left:
+                5px solid transparent;
+
+            border-right:
+                5px solid transparent;
+
+            border-top:
+                6px solid currentColor;
+        }
+
+        .group-trash-icon {
+            transform: scale(0.76);
         }
 
         .group-code-row {
@@ -2573,6 +2686,7 @@
 
         .menu-button,
         .group-option,
+        .group-action-button,
         .layer-option {
             color:
                 var(--ui-text);
@@ -2580,10 +2694,33 @@
 
         .menu-button:hover,
         .group-option:hover,
+        .group-action-button:hover,
         .layer-option:hover,
         .vehicle-group-choice:hover {
             background:
                 var(--ui-button-hover);
+        }
+
+        .group-action-button {
+            background:
+                var(--ui-button-bg);
+
+            color:
+                var(--ui-button-text);
+
+            border-color:
+                var(--ui-border);
+        }
+
+        .group-action-button.delete {
+            background:
+                var(--ui-danger-soft);
+
+            color:
+                var(--ui-danger);
+
+            border-color:
+                var(--ui-danger-border);
         }
 
         .group-option.active,
@@ -2826,7 +2963,8 @@
             }
 
             #group-menu {
-                width: 290px;
+                width:
+                    calc(100vw - 30px);
             }
 
             .square-button {
@@ -3493,7 +3631,7 @@
 
     <div class="modal">
 
-        <h2>
+        <h2 id="group-form-title">
             Crear grupo
         </h2>
 
@@ -3596,6 +3734,51 @@
                 type="button"
             >
                 Listo
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     MODAL ELIMINAR GRUPO
+========================================================= -->
+
+<div
+    id="delete-group-modal"
+    class="modal-background"
+>
+
+    <div class="modal">
+
+        <h2>
+            Eliminar grupo
+        </h2>
+
+        <p class="modal-text">
+            ¿Quieres eliminar este grupo? El grupo dejará de estar disponible para todos sus miembros.
+        </p>
+
+        <div class="modal-buttons">
+
+            <button
+                id="cancel-delete-group"
+                class="secondary-button"
+                type="button"
+            >
+                Cancelar
+            </button>
+
+            <button
+                id="confirm-delete-group"
+                class="modal-delete-button"
+                type="button"
+            >
+                Eliminar
             </button>
 
         </div>
@@ -3995,7 +4178,7 @@
 
         const APP_VERSION =
             window.APP_PARKING_VERSION ||
-            "2026-08-15-02";
+            "2026-08-16-01";
 
         const APP_VERSION_STORAGE_KEY =
             "app-parking-version";
@@ -4027,6 +4210,8 @@
 
         let userGroups = [];
         let selectedGroupId = "all";
+        let editingGroupId = null;
+        let pendingDeleteGroupId = null;
 
         let vehicles = [];
         let vehicleMarkers = new Map();
@@ -4144,6 +4329,9 @@
         const createGroupModal =
             document.getElementById("create-group-modal");
 
+        const groupFormTitle =
+            document.getElementById("group-form-title");
+
         const createGroupNameInput =
             document.getElementById("create-group-name");
 
@@ -4170,6 +4358,15 @@
 
         const closeCreatedGroupButton =
             document.getElementById("close-created-group");
+
+        const deleteGroupModal =
+            document.getElementById("delete-group-modal");
+
+        const cancelDeleteGroupButton =
+            document.getElementById("cancel-delete-group");
+
+        const confirmDeleteGroupButton =
+            document.getElementById("confirm-delete-group");
 
         const joinCodeInput =
             document.getElementById("join-code");
@@ -5283,6 +5480,97 @@
         }
 
 
+        function getGroupById(groupId) {
+
+            return userGroups.find(
+                function(group) {
+                    return group.id === groupId;
+                }
+            );
+
+        }
+
+
+        function isGroupAdmin(group) {
+
+            return Boolean(
+                group &&
+                group.role === "admin"
+            );
+
+        }
+
+
+        function createGroupActionButton(
+            label,
+            extraClassName,
+            iconClassName,
+            action
+        ) {
+
+            const button =
+                document.createElement("button");
+
+            button.type =
+                "button";
+
+            button.className =
+                "group-action-button" +
+                (
+                    extraClassName
+                        ? " " + extraClassName
+                        : ""
+                );
+
+            button.title =
+                label;
+
+            button.setAttribute(
+                "aria-label",
+                label
+            );
+
+            const icon =
+                document.createElement("span");
+
+            icon.className =
+                iconClassName;
+
+            icon.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            button.appendChild(icon);
+
+            button.addEventListener(
+                "pointerdown",
+                function(event) {
+                    event.stopPropagation();
+                }
+            );
+
+            button.addEventListener(
+                "click",
+                function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    action();
+                }
+            );
+
+            button.addEventListener(
+                "keydown",
+                function(event) {
+                    event.stopPropagation();
+                }
+            );
+
+            return button;
+
+        }
+
+
         function renderGroups() {
 
             dynamicGroups.innerHTML =
@@ -5325,9 +5613,15 @@
                     name.textContent =
                         group.name;
 
-                    nameRow.appendChild(name);
+                    const title =
+                        document.createElement("div");
 
-                    if (group.role === "admin") {
+                    title.className =
+                        "group-title";
+
+                    title.appendChild(name);
+
+                    if (isGroupAdmin(group)) {
                         const role =
                             document.createElement("span");
 
@@ -5337,8 +5631,42 @@
                         role.textContent =
                             "admin";
 
-                        nameRow.appendChild(role);
+                        title.appendChild(role);
                     }
+
+                    nameRow.appendChild(title);
+
+                    const actions =
+                        document.createElement("div");
+
+                    actions.className =
+                        "group-actions";
+
+                    actions.appendChild(
+                        createGroupActionButton(
+                            "Editar " + group.name,
+                            "",
+                            "pencil-icon",
+                            function() {
+                                openEditGroupModal(group.id);
+                            }
+                        )
+                    );
+
+                    if (isGroupAdmin(group)) {
+                        actions.appendChild(
+                            createGroupActionButton(
+                                "Eliminar " + group.name,
+                                "delete",
+                                "trash-icon group-trash-icon",
+                                function() {
+                                    openDeleteGroupModal(group.id);
+                                }
+                            )
+                        );
+                    }
+
+                    nameRow.appendChild(actions);
 
                     option.appendChild(nameRow);
 
@@ -5455,8 +5783,17 @@
 
         function openCreateGroupModal() {
 
+            editingGroupId =
+                null;
+
             groupMenu.style.display =
                 "none";
+
+            groupFormTitle.textContent =
+                "Crear grupo";
+
+            createGroupConfirmButton.textContent =
+                "Crear";
 
             createGroupNameInput.value =
                 "";
@@ -5481,6 +5818,65 @@
 
             createGroupModal.style.display =
                 "none";
+
+            editingGroupId =
+                null;
+
+        }
+
+
+        function openEditGroupModal(groupId) {
+
+            const group =
+                getGroupById(groupId);
+
+            if (!group) {
+                showToast(
+                    "No se encontró el grupo."
+                );
+
+                return;
+            }
+
+            editingGroupId =
+                group.id;
+
+            groupMenu.style.display =
+                "none";
+
+            groupFormTitle.textContent =
+                "Editar grupo";
+
+            createGroupConfirmButton.textContent =
+                "Guardar";
+
+            createGroupNameInput.value =
+                group.name || "";
+
+            createGroupDescriptionInput.value =
+                group.description || "";
+
+            createGroupModal.style.display =
+                "flex";
+
+            setTimeout(
+                function() {
+                    createGroupNameInput.focus();
+                },
+                50
+            );
+
+        }
+
+
+        async function saveGroup() {
+
+            if (editingGroupId) {
+                await updateGroup();
+                return;
+            }
+
+            await createGroup();
 
         }
 
@@ -5569,6 +5965,104 @@
         }
 
 
+        async function updateGroup() {
+
+            const group =
+                getGroupById(editingGroupId);
+
+            if (!group) {
+                showToast(
+                    "No se encontró el grupo."
+                );
+
+                return;
+            }
+
+            const groupName =
+                createGroupNameInput.value.trim();
+
+            const groupDescription =
+                createGroupDescriptionInput.value.trim();
+
+            if (!groupName) {
+                showToast(
+                    "Introduce un nombre de grupo."
+                );
+
+                createGroupNameInput.focus();
+
+                return;
+            }
+
+            setButtonLoading(
+                createGroupConfirmButton,
+                true,
+                "Guardando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "update_group",
+                        {
+                            p_group_id:
+                                group.id,
+
+                            p_name:
+                                groupName,
+
+                            p_description:
+                                groupDescription || null
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error editando grupo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                closeCreateGroupModal();
+
+                await loadGroups();
+
+                if (selectedGroupId === group.id) {
+                    const updatedGroup =
+                        getGroupById(group.id);
+
+                    selectedGroup.textContent =
+                        updatedGroup
+                            ? updatedGroup.name
+                            : groupName;
+                }
+
+                if (vehiclesModal.style.display === "flex") {
+                    renderVehiclesPanelFilter();
+                    renderVehiclesPanelList();
+                }
+
+                showToast(
+                    "Grupo actualizado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    createGroupConfirmButton,
+                    false
+                );
+            }
+
+        }
+
+
         function showCreatedGroupModal(group) {
 
             createdGroupName.textContent =
@@ -5579,6 +6073,136 @@
 
             createdGroupModal.style.display =
                 "flex";
+
+        }
+
+
+        function openDeleteGroupModal(groupId) {
+
+            const group =
+                getGroupById(groupId);
+
+            if (!group) {
+                showToast(
+                    "No se encontró el grupo."
+                );
+
+                return;
+            }
+
+            if (!isGroupAdmin(group)) {
+                showToast(
+                    "Solo el administrador puede eliminar este grupo."
+                );
+
+                return;
+            }
+
+            pendingDeleteGroupId =
+                group.id;
+
+            groupMenu.style.display =
+                "none";
+
+            deleteGroupModal.style.display =
+                "flex";
+
+        }
+
+
+        function closeDeleteGroupModal() {
+
+            deleteGroupModal.style.display =
+                "none";
+
+            pendingDeleteGroupId =
+                null;
+
+        }
+
+
+        async function deleteGroup() {
+
+            const group =
+                getGroupById(pendingDeleteGroupId);
+
+            if (!group) {
+                closeDeleteGroupModal();
+
+                showToast(
+                    "No se encontró el grupo."
+                );
+
+                return;
+            }
+
+            if (!isGroupAdmin(group)) {
+                closeDeleteGroupModal();
+
+                showToast(
+                    "Solo el administrador puede eliminar este grupo."
+                );
+
+                return;
+            }
+
+            setButtonLoading(
+                confirmDeleteGroupButton,
+                true,
+                "Eliminando..."
+            );
+
+            try {
+                const result =
+                    await supabaseClient.rpc(
+                        "delete_group",
+                        {
+                            p_group_id:
+                                group.id
+                        }
+                    );
+
+                if (result.error) {
+                    showToast(
+                        getReadableSupabaseError(result.error)
+                    );
+
+                    console.error(
+                        "Error eliminando grupo:",
+                        result.error
+                    );
+
+                    return;
+                }
+
+                closeDeleteGroupModal();
+
+                if (selectedGroupId === group.id) {
+                    selectGroup(
+                        "all",
+                        "Todos"
+                    );
+                }
+
+                await loadGroups();
+                await loadVehicles(true);
+
+                if (vehiclesModal.style.display === "flex") {
+                    renderVehiclesPanelFilter();
+                    renderVehiclesPanelList();
+                }
+
+                showToast(
+                    "Grupo eliminado."
+                );
+            }
+
+            finally {
+                setButtonLoading(
+                    confirmDeleteGroupButton,
+                    false
+                );
+            }
 
         }
 
@@ -5931,10 +6555,20 @@
                 deleteVehicleModal.style.display = "none";
             }
 
+            if (deleteGroupModal) {
+                deleteGroupModal.style.display = "none";
+            }
+
+            if (createGroupModal) {
+                createGroupModal.style.display = "none";
+            }
+
             if (deleteAccountModal) {
                 deleteAccountModal.style.display = "none";
             }
 
+            editingGroupId = null;
+            pendingDeleteGroupId = null;
             editingVehicleId = null;
             pendingDeleteVehicleId = null;
 
@@ -6224,7 +6858,7 @@
         function createVehiclesPanelItem(vehicle) {
 
             const canManageVehicle =
-                isVehicleOwnedByCurrentUser(vehicle);
+                canCurrentUserManageVehicle(vehicle);
 
             const item =
                 document.createElement("div");
@@ -6486,6 +7120,37 @@
         }
 
 
+        function isVehicleSharedWithUserGroup(vehicle) {
+
+            if (
+                !vehicle ||
+                !Array.isArray(vehicle.group_ids) ||
+                vehicle.group_ids.length === 0
+            ) {
+                return false;
+            }
+
+            return vehicle.group_ids.some(
+                function(groupId) {
+                    return Boolean(
+                        getGroupById(groupId)
+                    );
+                }
+            );
+
+        }
+
+
+        function canCurrentUserManageVehicle(vehicle) {
+
+            return (
+                isVehicleOwnedByCurrentUser(vehicle) ||
+                isVehicleSharedWithUserGroup(vehicle)
+            );
+
+        }
+
+
         function getVehiclesPanelFilterName() {
 
             const selectedOption =
@@ -6571,9 +7236,9 @@
                 return;
             }
 
-            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+            if (!canCurrentUserManageVehicle(vehicle)) {
                 showToast(
-                    "Solo el propietario puede editar este vehículo."
+                    "No tienes permiso para editar este vehículo."
                 );
 
                 return;
@@ -6760,9 +7425,9 @@
                 return;
             }
 
-            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+            if (!canCurrentUserManageVehicle(vehicle)) {
                 showToast(
-                    "Solo el propietario puede editar este vehículo."
+                    "No tienes permiso para editar este vehículo."
                 );
 
                 return;
@@ -6805,123 +7470,44 @@
             );
 
             try {
-                const vehicleResult =
-                    await supabaseClient
-                        .from("vehicles")
-                        .update({
-                            name:
+                const result =
+                    await supabaseClient.rpc(
+                        "update_visible_vehicle",
+                        {
+                            p_vehicle_id:
+                                vehicle.id,
+
+                            p_name:
                                 vehicleName,
 
-                            description:
+                            p_description:
                                 vehicleDescription || null,
 
-                            plate:
+                            p_plate:
                                 vehiclePlate || null,
 
-                            marker_type:
+                            p_marker_type:
                                 markerType,
 
-                            marker_color:
-                                markerColor
-                        })
-                        .eq("id", vehicle.id)
-                        .eq("owner_id", currentUser.id)
-                        .select("id")
-                        .maybeSingle();
+                            p_marker_color:
+                                markerColor,
 
-                if (vehicleResult.error) {
+                            p_group_ids:
+                                selectedGroupIds
+                        }
+                    );
+
+                if (result.error) {
                     showToast(
-                        getReadableSupabaseError(vehicleResult.error)
+                        getReadableSupabaseError(result.error)
                     );
 
                     console.error(
                         "Error editando vehículo:",
-                        vehicleResult.error
+                        result.error
                     );
 
                     return;
-                }
-
-                if (!vehicleResult.data) {
-                    showToast(
-                        "No se pudo guardar. Solo el propietario puede modificar el vehículo."
-                    );
-
-                    return;
-                }
-
-                const currentGroupIds =
-                    Array.isArray(vehicle.group_ids)
-                        ? vehicle.group_ids
-                        : [];
-
-                const groupsToRemove =
-                    currentGroupIds.filter(
-                        function(groupId) {
-                            return !selectedGroupIds.includes(groupId);
-                        }
-                    );
-
-                const groupsToAdd =
-                    selectedGroupIds.filter(
-                        function(groupId) {
-                            return !currentGroupIds.includes(groupId);
-                        }
-                    );
-
-                if (groupsToRemove.length > 0) {
-                    const removeResult =
-                        await supabaseClient
-                            .from("vehicle_groups")
-                            .delete()
-                            .eq("vehicle_id", vehicle.id)
-                            .in("group_id", groupsToRemove);
-
-                    if (removeResult.error) {
-                        showToast(
-                            getReadableSupabaseError(removeResult.error)
-                        );
-
-                        console.error(
-                            "Error quitando grupos del vehículo:",
-                            removeResult.error
-                        );
-
-                        return;
-                    }
-                }
-
-                if (groupsToAdd.length > 0) {
-                    const rows =
-                        groupsToAdd.map(
-                            function(groupId) {
-                                return {
-                                    vehicle_id:
-                                        vehicle.id,
-
-                                    group_id:
-                                        groupId
-                                };
-                            }
-                        );
-
-                    const addResult =
-                        await supabaseClient
-                            .from("vehicle_groups")
-                            .insert(rows);
-
-                    if (addResult.error) {
-                        showToast(
-                            getReadableSupabaseError(addResult.error)
-                        );
-
-                        console.error(
-                            "Error añadiendo grupos al vehículo:",
-                            addResult.error
-                        );
-
-                        return;
-                    }
                 }
 
                 closeCreateVehicleModal();
@@ -7051,9 +7637,9 @@
                 return;
             }
 
-            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+            if (!canCurrentUserManageVehicle(vehicle)) {
                 showToast(
-                    "Solo el propietario puede eliminar este vehículo."
+                    "No tienes permiso para eliminar este vehículo."
                 );
 
                 return;
@@ -7094,11 +7680,11 @@
                 return;
             }
 
-            if (!isVehicleOwnedByCurrentUser(vehicle)) {
+            if (!canCurrentUserManageVehicle(vehicle)) {
                 closeDeleteVehicleModal();
 
                 showToast(
-                    "Solo el propietario puede eliminar este vehículo."
+                    "No tienes permiso para eliminar este vehículo."
                 );
 
                 return;
@@ -7112,13 +7698,13 @@
 
             try {
                 const result =
-                    await supabaseClient
-                        .from("vehicles")
-                        .delete()
-                        .eq("id", vehicle.id)
-                        .eq("owner_id", currentUser.id)
-                        .select("id")
-                        .maybeSingle();
+                    await supabaseClient.rpc(
+                        "delete_visible_vehicle",
+                        {
+                            p_vehicle_id:
+                                vehicle.id
+                        }
+                    );
 
                 if (result.error) {
                     showToast(
@@ -7128,14 +7714,6 @@
                     console.error(
                         "Error eliminando vehículo:",
                         result.error
-                    );
-
-                    return;
-                }
-
-                if (!result.data) {
-                    showToast(
-                        "No se pudo eliminar. Solo el propietario puede borrar el vehículo."
                     );
 
                     return;
@@ -8518,7 +9096,7 @@
 
             createGroupConfirmButton.addEventListener(
                 "click",
-                createGroup
+                saveGroup
             );
 
             createGroupNameInput.addEventListener(
@@ -8526,9 +9104,19 @@
                 function(event) {
                     if (event.key === "Enter") {
                         event.preventDefault();
-                        createGroup();
+                        saveGroup();
                     }
                 }
+            );
+
+            cancelDeleteGroupButton.addEventListener(
+                "click",
+                closeDeleteGroupModal
+            );
+
+            confirmDeleteGroupButton.addEventListener(
+                "click",
+                deleteGroup
             );
 
             closeCreatedGroupButton.addEventListener(
@@ -8742,6 +9330,15 @@
                 function(event) {
                     if (event.target === createdGroupModal) {
                         createdGroupModal.style.display = "none";
+                    }
+                }
+            );
+
+            deleteGroupModal.addEventListener(
+                "click",
+                function(event) {
+                    if (event.target === deleteGroupModal) {
+                        closeDeleteGroupModal();
                     }
                 }
             );
@@ -9020,10 +9617,20 @@
             }
 
             if (
-                message.includes("delete_current_user") ||
-                message.includes("Could not find the function")
+                message.includes("update_group") ||
+                message.includes("delete_group") ||
+                message.includes("update_visible_vehicle") ||
+                message.includes("delete_visible_vehicle")
             ) {
+                return "Falta activar las funciones de grupos y vehículos en Supabase.";
+            }
+
+            if (message.includes("delete_current_user")) {
                 return "Falta activar la función segura para eliminar cuentas en Supabase.";
+            }
+
+            if (message.includes("Could not find the function")) {
+                return "Falta activar una función segura en Supabase.";
             }
 
             if (
@@ -9033,9 +9640,16 @@
                 message.includes("El grupo debe tener un nombre") ||
                 message.includes("El nombre del grupo es demasiado largo") ||
                 message.includes("La descripción es demasiado larga") ||
+                message.includes("No se encontró el grupo") ||
+                message.includes("No perteneces a este grupo") ||
+                message.includes("Solo el administrador puede eliminar este grupo") ||
+                message.includes("No se encontró el vehículo") ||
                 message.includes("El vehículo debe tener un nombre") ||
+                message.includes("El nombre del vehículo es demasiado largo") ||
+                message.includes("La matrícula es demasiado larga") ||
                 message.includes("No perteneces a uno de los grupos seleccionados") ||
                 message.includes("No tienes acceso a este vehículo") ||
+                message.includes("No tienes permiso para gestionar este vehículo") ||
                 message.includes("Latitud incorrecta") ||
                 message.includes("Longitud incorrecta") ||
                 message.includes("El vehículo ya está aparcado") ||
